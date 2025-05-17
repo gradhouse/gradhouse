@@ -1,16 +1,15 @@
-## Hi there 👋
+# gradhouse
 
-<!--
-**gradhouse/gradhouse** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## Overview
 
-Here are some ideas to get you started:
+## Features
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## Getting Started
+
+### Prerequisites
+
+### Installation
+
+```bash
+pip install -r requirements.txt
+```

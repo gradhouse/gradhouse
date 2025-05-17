@@ -1,0 +1,8 @@
+coverage
+matplotlib
+nbclassic
+numpy
+pytest
+pytest-mock
+pytest-cov
+
