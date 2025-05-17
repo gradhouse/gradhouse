@@ -2,6 +2,10 @@
 
 More information about this repository and examples can be found on the corresponding [wiki](https://github.com/gradhouse/gradhouse/wiki)
 
+## Status
+
+![CI](https://github.com/gradhouse/gradhouse/actions/workflows/ci.yml/badge.svg)
+
 ## Modules
 
 ### 1. arxiv
