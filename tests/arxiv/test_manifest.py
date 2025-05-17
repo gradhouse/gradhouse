@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import os
 import pytest
 import tempfile
+import warnings
 
 from gradhouse.arxiv.manifest import Manifest
 
@@ -644,45 +645,47 @@ def test_plot_summary_statistics(monkeypatch, mock_statistics):
     """
     Test the plot_summary_statistics method by mocking the output of get_statistics.
     """
-    # Create a Manifest instance
-    manifest = Manifest()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        # Create a Manifest instance
+        manifest = Manifest()
 
-    # Mock the get_statistics method
-    def mock_get_statistics(self):
-        return mock_statistics
+        # Mock the get_statistics method
+        def mock_get_statistics(self):
+            return mock_statistics
 
-    monkeypatch.setattr(Manifest, "get_statistics", mock_get_statistics)
+        monkeypatch.setattr(Manifest, "get_statistics", mock_get_statistics)
 
-    # Call the method
-    manifest.plot_summary_statistics()
+        # Call the method
+        manifest.plot_summary_statistics()
 
-    # Get all active figures
-    figures = [plt.figure(i) for i in plt.get_fignums()]
+        # Get all active figures
+        figures = [plt.figure(i) for i in plt.get_fignums()]
 
-    # Ensure three figures were created
-    assert len(figures) == 3
+        # Ensure three figures were created
+        assert len(figures) == 3
 
-    # Check the titles of the plots
-    expected_titles = [
-        'Number of Submissions per Month',
-        'Size in GB per Month',
-        'Averaged Monthly Submission Size in MB'
-    ]
-    for fig, expected_title in zip(figures, expected_titles):
-        assert fig.axes[0].get_title() == expected_title
+        # Check the titles of the plots
+        expected_titles = [
+            'Number of Submissions per Month',
+            'Size in GB per Month',
+            'Averaged Monthly Submission Size in MB'
+        ]
+        for fig, expected_title in zip(figures, expected_titles):
+            assert fig.axes[0].get_title() == expected_title
 
-    # Check the x-axis labels
-    expected_xlabels = ['Date (Year-Month)', 'Date (Year-Month)', 'Date (Year-Month)']
-    for fig, expected_xlabel in zip(figures, expected_xlabels):
-        assert fig.axes[0].get_xlabel() == expected_xlabel
+        # Check the x-axis labels
+        expected_xlabels = ['Date (Year-Month)', 'Date (Year-Month)', 'Date (Year-Month)']
+        for fig, expected_xlabel in zip(figures, expected_xlabels):
+            assert fig.axes[0].get_xlabel() == expected_xlabel
 
-    # Check the y-axis labels
-    expected_ylabels = ['Number of Submissions', 'Size (GB)', 'Average Submission Size (MB)']
-    for fig, expected_ylabel in zip(figures, expected_ylabels):
-        assert fig.axes[0].get_ylabel() == expected_ylabel
+        # Check the y-axis labels
+        expected_ylabels = ['Number of Submissions', 'Size (GB)', 'Average Submission Size (MB)']
+        for fig, expected_ylabel in zip(figures, expected_ylabels):
+            assert fig.axes[0].get_ylabel() == expected_ylabel
 
-    # Clean up the figures after the test
-    plt.close('all')
+        # Clean up the figures after the test
+        plt.close('all')
 
 
 def test_info(mocker):
