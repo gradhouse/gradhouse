@@ -1,16 +1,21 @@
 # gradhouse
 
+More information about this repository and examples can be found on the corresponding [wiki](https://github.com/gradhouse/gradhouse/wiki)
 
 ## Modules
 
-### 1. arXiv
-The <code>arxiv</code> module provides methods for handling the manifest file arXiv_src_manifest.xml downloaded from the arXiv S3 service.
+### 1. arxiv
+The arxiv module provides functions to handle the manifest file arXiv_src_manifest.xml, which can be downloaded from the arXiv S3 service.
 
-Examples on the use of this module can be found on the wiki [arxiv](https://github.com/gradhouse/gradhouse/wiki/arxiv)
-
-For more general information about arXiv itself:
+For more details about arXiv and bulk data downloads, please refer to the following resources:
 * https://www.arxiv.org
 * https://info.arxiv.org/help/bulk_data_s3.html
+
+Summary statistics is one example of the usecases handled by this module. 
+
+![image](https://github.com/user-attachments/assets/cdda1543-cea0-4e17-b612-1e3778f31b64)
+![image](https://github.com/user-attachments/assets/1063ab4b-992d-41bf-8a76-b2d9f2039845)
+![image](https://github.com/user-attachments/assets/909d563e-0090-4e7d-985d-cc4ee4b61f16)
 
 ## Installation
 
