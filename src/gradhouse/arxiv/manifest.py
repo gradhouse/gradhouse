@@ -15,14 +15,14 @@ from gradhouse.file.handler.xml_handler import XmlHandler
 
 class Manifest:
     """
-    Represents the manifest file (arXiv_src_manifest.xml) that indexes bulk source archives
-    (.tar files) downloaded from arXiv's S3 service.
+    This class provides functions to handle the manifest file arXiv_src_manifest.xml that indexes the bulk source
+    archive files arXiv_src_yymm_seq.tar downloaded from arXiv's S3 service.
 
     Each entry in the manifest corresponds to a single bulk source archive, which itself contains
     the source packages for multiple arXiv submissions. The manifest serves as a high-level index,
     tracking metadata such as archive names, arXiv ID ranges, file sizes, and checksums.
 
-    For more information, see:
+    For more details about arXiv and bulk data downloads, please refer to the following resources:
         https://www.arxiv.org
         https://info.arxiv.org/help/bulk_data_s3.html
 
