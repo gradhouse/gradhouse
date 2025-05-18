@@ -6,6 +6,14 @@ More information about this repository and examples can be found on the correspo
 
 ![CI](https://github.com/gradhouse/gradhouse/actions/workflows/ci.yml/badge.svg)
 
+## Disclaimer
+
+This project is not affiliated with, endorsed by, or sponsored by arXiv or Cornell University.  
+arXiv® is a registered trademark of Cornell University.  
+All arXiv data and trademarks are the property of their respective owners.   
+For more information, see [arXiv’s terms of use](https://arxiv.org/help/license) and [bulk data policy](https://info.arxiv.org/help/bulk_data_s3.html).
+
+
 ## Modules
 
 ### 1. arxiv

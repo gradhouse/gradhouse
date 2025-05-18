@@ -3,6 +3,12 @@
 #
 # Copyright (c) 2025 Jason Stuber
 # Licensed under the MIT License. See the LICENSE file for more details.
+#
+# Disclaimer:
+# This project is not affiliated with, endorsed by, or sponsored by arXiv or Cornell University.
+# arXiv® is a registered trademark of Cornell University.
+# All arXiv data and trademarks are the property of their respective owners.
+# For more information, see https://arxiv.org/help/license and https://info.arxiv.org/help/bulk_data_s3.html
 
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -23,7 +29,6 @@ class Manifest:
     tracking metadata such as archive names, arXiv ID ranges, file sizes, and checksums.
 
     For more details about arXiv and bulk data downloads, please refer to the following resources:
-        https://www.arxiv.org
         https://info.arxiv.org/help/bulk_data_s3.html
 
     The manifest is modeled as a dictionary with two main components:
