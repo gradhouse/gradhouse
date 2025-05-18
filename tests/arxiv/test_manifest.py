@@ -431,7 +431,7 @@ def test_import_arxiv_xml_file_not_found():
     """
     manifest = Manifest()
 
-    with pytest.raises(FileNotFoundError, match='arXiv XML file not found'):
+    with pytest.raises(FileNotFoundError, match='file not found'):
         manifest.import_arxiv_xml('non_existent_file.xml')
 
 def test_import_arxiv_xml_invalid_structure():
@@ -803,3 +803,18 @@ def test_manifest_init_with_filename(monkeypatch):
     manifest = Manifest(arxiv_xml_file=test_path)
 
     assert called['file_path'] == test_path
+
+def test_import_arxiv_xml_invalid_format(monkeypatch, tmp_path):
+    """
+    Test that import_arxiv_xml raises TypeError if the file is not a valid XML format.
+    """
+    # Create a dummy file
+    file_path = tmp_path / "not_xml.txt"
+    file_path.write_text("not xml content")
+
+    # Patch XmlHandler.is_xml_format to return False
+    monkeypatch.setattr("gradhouse.arxiv.manifest.XmlHandler.is_xml_format", lambda x: False)
+
+    manifest = Manifest()
+    with pytest.raises(TypeError, match="file is not in XML format."):
+        manifest.import_arxiv_xml(str(file_path))
