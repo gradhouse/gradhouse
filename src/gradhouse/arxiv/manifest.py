@@ -109,14 +109,17 @@ class Manifest:
             The file is generally called arXiv_src_manifest.xml
 
         :raises FileNotFoundError: If the file is not found.
-        :raises TypeError: If the file content is not in arXiv XML format.
-        :raises ValueError: If a file entry is inconsistent.
+        :raises TypeError: If the file is not in XML format.
+        :raises ValueError: If entries are missing in arXiv XML file
         """
 
         self.clear()
 
         if not os.path.isfile(file_path):
-            raise FileNotFoundError('arXiv XML file not found')
+            raise FileNotFoundError('file not found')
+
+        if not XmlHandler.is_xml_format(file_path):
+            raise TypeError('file is not in XML format.')
 
         xml_dict = XmlHandler.read_xml_to_dict(file_path)
 
