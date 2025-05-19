@@ -5,10 +5,12 @@
 # Licensed under the MIT License. See the LICENSE file for more details.
 #
 # Disclaimer:
-# This project is not affiliated with, endorsed by, or sponsored by arXiv or Cornell University.
-# arXiv® is a registered trademark of Cornell University.
-# All arXiv data and trademarks are the property of their respective owners.
-# For more information, see https://arxiv.org/help/license and https://info.arxiv.org/help/bulk_data_s3.html
+# This software is not affiliated with, endorsed by, or sponsored by arXiv, Cornell University, or any of their affiliates.
+# All arXiv data, logos, and trademarks are the property of their respective owners.
+# Users of this software are solely responsible for ensuring their use of arXiv data complies with arXiv's policies and terms.
+# For more information, see:
+# - https://arxiv.org/help/license
+# - https://info.arxiv.org/help/bulk_data_s3.html
 
 from datetime import datetime
 import matplotlib.pyplot as plt
