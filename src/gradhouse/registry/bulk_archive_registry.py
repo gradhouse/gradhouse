@@ -12,31 +12,18 @@
 # - https://arxiv.org/help/license
 # - https://info.arxiv.org/help/bulk_data_s3.html
 
-class BulkArchiveRegistry:
+from .registry import Registry
+
+class BulkArchiveRegistry(Registry):
     """
     This module provides the BulkArchiveRegistry class, which manages the registration and tracking of bulk archive
     files, such as those downloaded from arXiv or similar repositories. It offers methods for adding, removing,
     and querying archive entries, supporting efficient management of large collections of archive data.
+
+    The key for each entry is the SHA256 hash of the bulk archive file with the entry comprised as a dictionary
+    with the metadata and bulk archive origin.
+
+    The BulkArchiveRegistry does not contain the SHA256 hashes for each Submission entry of the tar
     """
 
-    def __init__(self) -> None:
-        """
-        Initializes a new instance of the BulkArchiveRegistry class.
-
-        This constructor sets up the internal _registry dictionary for the bulk archive files, each bulk archive file
-        being a .tar file comprised of multiple submissions.
-
-        The key for each entry is the SHA256 hash of the bulk archive file with the entry comprised as a dictionary
-        with the metadata and bulk archive origin.
-
-        Submission contents and submission hashes are not contained in this registry.
-        """
-
-        self._registry = dict()
-
-    def clear(self) -> None:
-        """
-        Clears the registry and resets it to its default state.
-        """
-
-        self._registry.clear()
+    pass
