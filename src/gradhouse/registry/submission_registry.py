@@ -12,29 +12,18 @@
 # - https://arxiv.org/help/license
 # - https://info.arxiv.org/help/bulk_data_s3.html
 
-class SubmissionRegistry:
+from .registry import Registry
+
+class SubmissionRegistry(Registry):
     """
     This module defines the SubmissionRegistry class, responsible for maintaining a registry of individual submissions
     or entries, typically identified by unique hash keys. It provides methods to add, check, delete, and clear
     submission records, facilitating organized tracking of submission data within the application.
+
+    The key for each entry is the SHA256 hash of the submission file with the value as a dictionary with the
+    metadata and submission origin.
+
+    The submission contents are not contained in this registry.
     """
 
-    def __init__(self) -> None:
-        """
-        Initializes a new instance of the SubmissionRegistry class.
-
-        This constructor sets up the internal _registry dictionary for the submissions.
-        The key for each entry is the SHA256 hash of the submission file with the value as a dictionary with the
-        metadata and submission origin.
-
-        The submission contents are not contained in this registry.
-        """
-
-        self._registry = dict()
-
-    def clear(self) -> None:
-        """
-        Clears the registry and resets it to its default state.
-        """
-
-        self._registry.clear()
+    pass
