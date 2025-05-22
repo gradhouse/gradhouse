@@ -15,6 +15,10 @@
 import os
 import re
 
+from gradhouse.file.file_handler import FileHandler
+from gradhouse.file.file_type import FileType
+from gradhouse.file.handler.archive_handler import ArchiveHandler
+
 class Patterns:
     """
     This class contains static methods for parsing, validating, and constructing information related to arXiv bulk
@@ -91,7 +95,7 @@ class Patterns:
     @staticmethod
     def parse_old_style_submission_filename(filename: str) -> tuple[str, str, str, str] | None:
         """
-        Parse an older-style arXiv submission filename and extract its components.
+        Parse an older-style arXiv submission filename (pre-2008) and extract its components.
 
         Older arXiv submission filenames follow the pattern:
             {category}{yy}{mm}{number}.{ext}
@@ -179,7 +183,7 @@ class Patterns:
         Generate the URL for the given arXiv submission filename.
 
         Submission filenames have one of the two patterns:
-            1. Subject and number (older classification scheme):
+            1. Subject and number (older classification scheme, pre-2008):
                e.g., cond-mat9602101.gz → https://arxiv.org/abs/cond-mat/9602101
             2. Number only (newest classification scheme):
                e.g., 1202.3054.gz → https://arxiv.org/abs/1202.3054
@@ -208,3 +212,66 @@ class Patterns:
             raise ValueError(f"Invalid arXiv submission filename: {filename}")
         
         return url
+
+    @staticmethod
+    def check_bulk_archive(file_path: str) -> list[str]:
+        """
+        Validate an arXiv bulk archive file and return a list of error messages describing any issues found.
+
+        This method performs a series of checks to ensure the file is a valid arXiv bulk archive:
+          1. Checks that the filename matches the expected arXiv bulk archive naming pattern.
+          2. Checks that the file exists at the specified path.
+          3. Checks that the file extension and format are both recognized as a tar archive.
+          4. Checks that the archive can be safely extracted (e.g., no filename collisions, traversal, etc.).
+          5. Checks that all entries inside the archive match the expected arXiv submission filename pattern.
+
+        The method stops further checks if a critical error is found at any stage (e.g., invalid filename or file not found).
+
+        :param file_path: str, path to the bulk archive file to validate.
+        :returns: list[str], a list of error messages.
+            If the list is empty, the bulk archive file is considered valid and extraction is possible.
+        """
+
+        error_list = []
+
+        # Check filename pattern
+        if not Patterns.is_bulk_archive_filename(file_path):
+            error_list.append(f'Filename {file_path} does not match bulk archive pattern')
+
+        # Check file existence only if pattern is valid
+        if not error_list:
+            if not os.path.isfile(file_path):
+                error_list.append(f'File {file_path} not found')
+
+        # Check file type only if previous checks passed
+        if not error_list:
+            if FileType.FILE_TYPE_ARCHIVE_TAR not in FileHandler.get_file_type_from_extension(file_path):
+                error_list.append('File extension is not tar')
+            elif FileType.FILE_TYPE_ARCHIVE_TAR != FileHandler.get_file_type_from_format(file_path):
+                error_list.append('File format is not tar')
+
+        # check that the archive could be in principle extracted
+        if not error_list:
+            default_extract_path = '/'
+            archive_errors = ArchiveHandler.check_extract_possible(file_path, default_extract_path)
+            error_list.extend(archive_errors)
+
+        if not error_list:
+            archive_contents = ArchiveHandler.list_contents(file_path)
+            invalid_entries = [entry for entry in archive_contents if not Patterns.is_submission_filename(entry)]
+            if invalid_entries:
+                error_list.append(f"Archive entries do not match submission filename pattern: {', '.join(invalid_entries)}")
+
+        return error_list
+
+    @staticmethod
+    def is_bulk_archive_valid(file_path: str) -> bool:
+        """
+        Check if the given file is a valid arXiv bulk archive.
+        See check_bulk_archive for the list of checks.
+
+        :param file_path: str, path to the bulk archive file to validate.
+        :return: bool, True if the file is a valid bulk archive, False otherwise.
+        """
+
+        return len(Patterns.check_bulk_archive(file_path)) == 0

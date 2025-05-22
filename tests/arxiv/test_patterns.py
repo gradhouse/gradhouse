@@ -13,6 +13,7 @@
 # - https://info.arxiv.org/help/bulk_data_s3.html
 
 import pytest
+from gradhouse.file.file_type import FileType
 from gradhouse.arxiv.patterns import Patterns
 
 @pytest.mark.parametrize(
@@ -401,3 +402,105 @@ def test_generate_url_for_submission_filename_invalid(filename):
     else:
         with pytest.raises(ValueError):
             Patterns.generate_url_for_submission_filename(filename)
+
+@pytest.mark.parametrize(
+    "file_path,expected_errors,expected_valid",
+    [
+        # Invalid filename pattern
+        ("not_a_bulk_archive.tar", ["Filename not_a_bulk_archive.tar does not match bulk archive pattern"], False),
+        # File does not exist (but pattern is valid)
+        ("arXiv_src_9902_005.tar", ["File arXiv_src_9902_005.tar not found"], False),
+        # Invalid extension (simulate file exists)
+        ("arXiv_src_9902_005.txt", ["Filename arXiv_src_9902_005.txt does not match bulk archive pattern"], False),
+        # Valid file, but extension/type/format errors (simulate with mocks)
+        # These cases require monkeypatching/mocking if you want to simulate file existence and type checks.
+    ]
+)
+def test_check_bulk_archive_and_is_bulk_archive_valid_basic(file_path, expected_errors, expected_valid, mocker):
+    """
+    Test check_bulk_archive and is_bulk_archive_valid for basic error cases.
+    """
+    # Mock os.path.isfile to simulate file existence for the second case
+    if file_path == "arXiv_src_9902_005.tar":
+        mocker.patch("os.path.isfile", return_value=False)
+    else:
+        mocker.patch("os.path.isfile", return_value=True)
+
+    # Mock FileHandler methods to avoid dependency on actual files
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension",
+                 return_value=[FileType.FILE_TYPE_ARCHIVE_TAR])
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format",
+                 return_value=FileType.FILE_TYPE_ARCHIVE_TAR)
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.check_extract_possible", return_value=[])
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents", return_value=["1202.3054.gz"])
+
+    errors = Patterns.check_bulk_archive(file_path)
+    assert errors == expected_errors
+    assert Patterns.is_bulk_archive_valid(file_path) == expected_valid
+
+def test_check_bulk_archive_and_is_bulk_archive_valid_success(mocker):
+    """
+    Test check_bulk_archive and is_bulk_archive_valid for a fully valid bulk archive file.
+    """
+    file_path = "arXiv_src_9902_005.tar"
+    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension",
+                 return_value=[FileType.FILE_TYPE_ARCHIVE_TAR])
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format",
+                 return_value=FileType.FILE_TYPE_ARCHIVE_TAR)
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.check_extract_possible", return_value=[])
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents", return_value=["1202.3054.gz"])
+
+    errors = Patterns.check_bulk_archive(file_path)
+    assert errors == []
+    assert Patterns.is_bulk_archive_valid(file_path) is True
+
+def test_check_bulk_archive_invalid_archive_contents(mocker):
+    """
+    Test check_bulk_archive for a valid archive file with invalid contents.
+    """
+    file_path = "arXiv_src_9902_005.tar"
+    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension",
+                 return_value=[FileType.FILE_TYPE_ARCHIVE_TAR])
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format",
+                 return_value=FileType.FILE_TYPE_ARCHIVE_TAR)
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.check_extract_possible", return_value=[])
+    # Simulate invalid archive contents
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents", return_value=["not_a_submission.txt", "1202.3054.gz"])
+
+    errors = Patterns.check_bulk_archive(file_path)
+    assert errors == ["Archive entries do not match submission filename pattern: not_a_submission.txt"]
+    assert Patterns.is_bulk_archive_valid(file_path) is False
+
+def test_check_bulk_archive_extension_not_tar(mocker):
+    """
+    Test check_bulk_archive when the file extension is not recognized as tar.
+    """
+    file_path = "arXiv_src_9902_005.tar"
+    mocker.patch("os.path.isfile", return_value=True)
+    # Simulate extension is not tar
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension", return_value=[])
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format", return_value=FileType.FILE_TYPE_ARCHIVE_TAR)
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.check_extract_possible", return_value=[])
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents", return_value=["1202.3054.gz"])
+
+    errors = Patterns.check_bulk_archive(file_path)
+    assert errors == ['File extension is not tar']
+    assert Patterns.is_bulk_archive_valid(file_path) is False
+
+def test_check_bulk_archive_format_not_tar(mocker):
+    """
+    Test check_bulk_archive when the file format is not tar, even though the extension is correct.
+    """
+    file_path = "arXiv_src_9902_005.tar"
+    mocker.patch("os.path.isfile", return_value=True)
+    # Simulate extension is tar, but format is not tar
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension", return_value=[FileType.FILE_TYPE_ARCHIVE_TAR])
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format", return_value="not_tar")
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.check_extract_possible", return_value=[])
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents", return_value=["1202.3054.gz"])
+
+    errors = Patterns.check_bulk_archive(file_path)
+    assert errors == ['File format is not tar']
+    assert Patterns.is_bulk_archive_valid(file_path) is False

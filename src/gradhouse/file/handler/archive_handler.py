@@ -323,7 +323,7 @@ class ArchiveHandler:
         return file_list
 
     @staticmethod
-    def is_extract_possible(source_file_path: str, destination_directory: str) -> bool:
+    def check_extract_possible(source_file_path: str, destination_directory: str) -> list[str]:
         """
         Indicator method to check that the archive extraction is to a valid location, the contents filenames are not
         forbidden, and that the destination directory exists and the extracted files will not overwrite an existing
@@ -332,7 +332,7 @@ class ArchiveHandler:
         :param source_file_path: str, path to the archive file
         :param destination_directory: str, path to the destination directory
             This method checks that the extraction of the archive contents into this directory is safe.
-        :returns: bool, True if the extraction is possible, False if extraction is forbidden.
+        :returns: list[str], list of errors, if the list is empty then extraction is possible.
         """
 
         error_log = []
@@ -364,7 +364,24 @@ class ArchiveHandler:
                         error_log.append('destination file already exists')
                         break
 
+        return error_log
+
+    @staticmethod
+    def is_extract_possible(source_file_path: str, destination_directory: str) -> bool:
+        """
+        Indicator method to check that the archive extraction is to a valid location, the contents filenames are not
+        forbidden, and that the destination directory exists and the extracted files will not overwrite an existing
+        filename.
+
+        :param source_file_path: str, path to the archive file
+        :param destination_directory: str, path to the destination directory
+            This method checks that the extraction of the archive contents into this directory is safe.
+        :returns: bool, True if the extraction is possible, False if extraction is forbidden.
+        """
+
+        error_log = ArchiveHandler.check_extract_possible(source_file_path, destination_directory)
         is_possible = len(error_log) == 0
+
         return is_possible
 
     @staticmethod

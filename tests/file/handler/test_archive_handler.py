@@ -6,7 +6,6 @@
 
 import os
 import struct
-import tempfile
 import pytest
 
 from gradhouse.file.handler.archive_handler import ArchiveHandler
@@ -914,3 +913,66 @@ def test_list_gzip_contents_invalid_compression_format(tmp_path, monkeypatch):
     # Should not raise, just return empty list
     result = ArchiveHandler._list_gzip_contents(str(invalid_gzip))
     assert result == []
+
+@pytest.mark.parametrize("source_file_path, destination_directory, expected_errors", [
+    # Source file not found
+    ('this_is_not_a_file', TEST_SCRATCH_DIRECTORY, ['file not found']),
+    # Source file is a directory
+    (os.path.dirname(__file__), TEST_SCRATCH_DIRECTORY, ['file not found']),
+    # Destination directory not found
+    (os.path.join(TEST_DATA_DIRECTORY, 'archive/tar_archive_file.tar'), 'non_existent_directory', ['destination directory not found']),
+    # Destination directory is a file
+    (os.path.join(TEST_DATA_DIRECTORY, 'archive/tar_archive_file.tar'),
+     os.path.join(TEST_DATA_DIRECTORY, 'top_level_text_file.txt'),
+     ['destination directory not found']),
+])
+def test_check_extract_possible_file_or_dir_not_found(source_file_path, destination_directory, expected_errors):
+    """
+    Test check_extract_possible for file or directory not found cases.
+    """
+    errors = ArchiveHandler.check_extract_possible(source_file_path, destination_directory)
+    assert errors == expected_errors
+
+def test_check_extract_possible_contents_filenames_not_unique(mocker):
+    """
+    Test check_extract_possible when archive filenames are not case-insensitive unique.
+    """
+    source_file_path = os.path.join(TEST_DATA_DIRECTORY, 'archive/tar_archive_file.tar')
+    destination_directory = TEST_SCRATCH_DIRECTORY
+    mocker.patch('gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents', return_value=['file1.txt', 'File1.txt'])
+
+    errors = ArchiveHandler.check_extract_possible(source_file_path, destination_directory)
+    assert 'archive contents filename is not unique on case-insensitive file systems' in errors
+
+def test_check_extract_possible_contents_filename_traversal(mocker):
+    """
+    Test check_extract_possible when archive filenames have directory traversal.
+    """
+    source_file_path = os.path.join(TEST_DATA_DIRECTORY, 'archive/tar_archive_file.tar')
+    destination_directory = TEST_SCRATCH_DIRECTORY
+    mocker.patch('gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents', return_value=['../file1.txt'])
+
+    errors = ArchiveHandler.check_extract_possible(source_file_path, destination_directory)
+    assert 'archive contents filenames are forbidden' in errors
+
+def test_check_extract_possible_destination_file_exists(mocker):
+    """
+    Test check_extract_possible when the destination file already exists.
+    """
+    source_file_path = os.path.join(TEST_DATA_DIRECTORY, 'archive/tar_archive_file.tar')
+    destination_directory = TEST_DATA_DIRECTORY
+    mocker.patch('gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents', return_value=['top_level_text_file.txt'])
+
+    errors = ArchiveHandler.check_extract_possible(source_file_path, destination_directory)
+    assert 'destination file already exists' in errors
+
+def test_check_extract_possible_success(mocker):
+    """
+    Test check_extract_possible when extraction is possible (no errors).
+    """
+    source_file_path = os.path.join(TEST_DATA_DIRECTORY, 'archive/tar_archive_file.tar')
+    destination_directory = TEST_SCRATCH_DIRECTORY
+    mocker.patch('gradhouse.file.handler.archive_handler.ArchiveHandler.list_contents', return_value=['sample_contents.txt'])
+
+    errors = ArchiveHandler.check_extract_possible(source_file_path, destination_directory)
+    assert errors == []
