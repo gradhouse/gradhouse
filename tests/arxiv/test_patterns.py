@@ -504,3 +504,62 @@ def test_check_bulk_archive_format_not_tar(mocker):
     errors = Patterns.check_bulk_archive(file_path)
     assert errors == ['File format is not tar']
     assert Patterns.is_bulk_archive_valid(file_path) is False
+
+@pytest.mark.parametrize(
+    "file_path,pattern_valid,file_exists,ext_types,format_type,archive_errors,expected_errors,expected_valid",
+    [
+        # Invalid filename pattern
+        ("not_a_submission.pdf", False, True, [FileType.FILE_TYPE_PDF], FileType.FILE_TYPE_PDF, [], ["Filename not_a_submission.pdf does not match submission pattern"], False),
+        # File does not exist
+        ("1202.3051.pdf", True, False, [FileType.FILE_TYPE_PDF], FileType.FILE_TYPE_PDF, [], ["File 1202.3051.pdf not found"], False),
+        # Extension not allowed
+        ("1202.3052.txt", True, True, [], FileType.FILE_TYPE_PDF, [], ["File extension type is not allowed"], False),
+        # Format not allowed
+        ("1202.3053.pdf", True, True, [FileType.FILE_TYPE_PDF], FileType.FILE_TYPE_XML, [], ["File type XML not allowed"], False),
+        # Format does not match extension
+        ("1202.3054.pdf", True, True, [FileType.FILE_TYPE_PDF], FileType.FILE_TYPE_ARCHIVE_GZ, [], ["File format does not match file extension"], False),
+        # Archive extraction errors
+        ("1202.3055.gz", True, True, [FileType.FILE_TYPE_ARCHIVE_GZ], FileType.FILE_TYPE_ARCHIVE_GZ, ["archive error"], ["archive error"], False),
+        # All valid (PDF)
+        ("1202.3056.pdf", True, True, [FileType.FILE_TYPE_PDF], FileType.FILE_TYPE_PDF, [], [], True),
+        # All valid (GZ)
+        ("1202.3057.gz", True, True, [FileType.FILE_TYPE_ARCHIVE_GZ], FileType.FILE_TYPE_ARCHIVE_GZ, [], [], True),
+    ]
+)
+def test_check_submission_and_is_submission_valid(
+    mocker, file_path, pattern_valid, file_exists, ext_types, format_type, archive_errors, expected_errors, expected_valid
+):
+    """
+    Test check_submission and is_submission_valid for various scenarios.
+    """
+    # Mock Patterns.is_submission_filename
+    mocker.patch("gradhouse.arxiv.patterns.Patterns.is_submission_filename", return_value=pattern_valid)
+    # Mock os.path.isfile
+    mocker.patch("os.path.isfile", return_value=file_exists)
+    # Mock FileHandler.get_file_type_from_extension
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension", return_value=ext_types)
+    # Mock FileHandler.get_file_type_from_format
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format", return_value=format_type)
+    # Mock ArchiveHandler.check_extract_possible
+    mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.check_extract_possible", return_value=archive_errors)
+
+    errors = Patterns.check_submission(file_path)
+    assert errors == expected_errors
+    assert Patterns.is_submission_valid(file_path) == expected_valid
+
+def test_check_submission_archive_extraction_only_if_archive(mocker):
+    """
+    Test that archive extraction errors are only checked for allowed archive types.
+    """
+    file_path = "1202.3054.pdf"
+    mocker.patch("gradhouse.arxiv.patterns.Patterns.is_submission_filename", return_value=True)
+    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension", return_value=[FileType.FILE_TYPE_PDF])
+    mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format", return_value=FileType.FILE_TYPE_PDF)
+    # Should not call check_extract_possible for PDF
+    mock_check_extract = mocker.patch("gradhouse.file.handler.archive_handler.ArchiveHandler.check_extract_possible", return_value=["archive error"])
+
+    errors = Patterns.check_submission(file_path)
+    assert errors == []
+    assert Patterns.is_submission_valid(file_path) is True
+    mock_check_extract.assert_not_called()
