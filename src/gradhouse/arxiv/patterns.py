@@ -268,10 +268,73 @@ class Patterns:
     def is_bulk_archive_valid(file_path: str) -> bool:
         """
         Check if the given file is a valid arXiv bulk archive.
-        See check_bulk_archive for the list of checks.
+        See check_bulk_archive() for the list of checks.
 
         :param file_path: str, path to the bulk archive file to validate.
         :return: bool, True if the file is a valid bulk archive, False otherwise.
         """
 
         return len(Patterns.check_bulk_archive(file_path)) == 0
+
+    @staticmethod
+    def check_submission(file_path: str) -> list[str]:
+        """
+        Validate an arXiv submission file and return a list of error messages describing any issues found.
+
+        This method performs a series of checks to ensure the file is a valid arXiv submission:
+          1. Checks that the filename matches the expected arXiv submission naming pattern.
+          2. Checks that the file exists at the specified path.
+          3. Checks that the file extension and format are among the allowed types (GZ, TGZ, or PDF).
+          4. Checks that the file format matches the file extension.
+          5. If the file is an archive (GZ or TGZ), checks that it can be safely extracted.
+
+        The method stops further checks if a critical error is found at any stage (e.g., invalid filename or file not found).
+
+        :param file_path: str, path to the submission file to validate.
+        :return: list[str], a list of error messages. If the list is empty, the file is considered valid.
+        """
+        allowed_file_types = [FileType.FILE_TYPE_ARCHIVE_GZ, FileType.FILE_TYPE_ARCHIVE_TGZ, FileType.FILE_TYPE_PDF]
+        allowed_archive_file_types = [FileType.FILE_TYPE_ARCHIVE_GZ, FileType.FILE_TYPE_ARCHIVE_TGZ]
+
+        error_list = []
+
+        # Check filename pattern
+        if not Patterns.is_submission_filename(file_path):
+            error_list.append(f'Filename {file_path} does not match submission pattern')
+
+        # Check file existence only if pattern is valid
+        if not error_list:
+            if not os.path.isfile(file_path):
+                error_list.append(f'File {file_path} not found')
+
+        # Check file type only if previous checks passed
+        if not error_list:
+            file_types_by_extension = FileHandler.get_file_type_from_extension(file_path)
+            file_type_by_format = FileHandler.get_file_type_from_format(file_path)
+
+            if not any(file_type in allowed_file_types for file_type in file_types_by_extension):
+                error_list.append('File extension type is not allowed')
+            elif file_type_by_format not in allowed_file_types:
+                error_list.append(f'File type {file_type_by_format.value} not allowed')
+            elif file_type_by_format not in file_types_by_extension:
+                error_list.append('File format does not match file extension')
+
+            # check that the archive could be in principle extracted
+            if not error_list and (file_type_by_format in allowed_archive_file_types):
+                default_extract_path = '/'
+                archive_errors = ArchiveHandler.check_extract_possible(file_path, default_extract_path)
+                error_list.extend(archive_errors)
+
+        return error_list
+
+    @staticmethod
+    def is_submission_valid(file_path: str) -> bool:
+        """
+        Check if the given file is a valid arXiv submission.
+        See check_submission() for the list of checks.
+
+        :param file_path: str, path to the submission file to validate.
+        :return: bool, True if the file is a validsubmission, False otherwise.
+        """
+
+        return len(Patterns.check_submission(file_path)) == 0
