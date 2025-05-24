@@ -28,3 +28,22 @@ class FileType(Enum):
     FILE_TYPE_POSTSCRIPT_EPSI = 'POSTSCRIPT_EPSI'
 
     FILE_TYPE_XML = 'XML'
+
+    FILE_TYPE_TEX_AUX = 'TEX_AUX'
+    FILE_TYPE_TEX_BBL = 'TEX_BBL'
+    FILE_TYPE_TEX_BIB = 'TEX_BIB'
+    FILE_TYPE_TEX_BST = 'TEX_BST'
+    FILE_TYPE_TEX_CLO = 'TEX_CLO'                       # class options
+    FILE_TYPE_TEX_CLS = 'TEX_CLS'
+    FILE_TYPE_TEX_DVI = 'TEX_DVI'
+    FILE_TYPE_TEX_FIG = 'TEX_FIG'                       # xfig
+    FILE_TYPE_TEX_LOG = 'TEX_LOG'
+    FILE_TYPE_TEX_PSTEX = 'TEX_PSTEX'                   # ps part of xfig export
+    FILE_TYPE_TEX_PSTEX_T = 'TEX_PSTEX_T'               # LaTeX part of xfig export
+    FILE_TYPE_TEX_STY = 'TEX_STY'
+    FILE_TYPE_TEX_SYNCTEX = 'TEX_SYNCTEX'               # used for sync tools between latex file and pdf
+    FILE_TYPE_TEX_TEX = 'TEX_TEX'
+    FILE_TYPE_TEX_LATEX_209_MAIN = 'TEX_LATEX_209_MAIN' # LaTeX 2.09 main file
+    FILE_TYPE_TEX_LATEX_2E_MAIN = 'TEX_LATEX_2E_MAIN'   # LaTeX 2e main file
+    FILE_TYPE_TEX_TIKZ = 'TEX_TIKZ'                     # TikZ ist kein Zeichenprogramm package
+    FILE_TYPE_TEX_TOC = 'TEX_TOC'
