@@ -14,6 +14,7 @@ from gradhouse.file.file_type import FileType
 from gradhouse.file.handler.archive_handler import ArchiveHandler
 from gradhouse.file.handler.pdf_handler import PdfHandler
 from gradhouse.file.handler.postscript_handler import PostscriptHandler
+from gradhouse.file.handler.tex_handler import TexHandler
 from gradhouse.file.handler.xml_handler import XmlHandler
 
 
@@ -22,7 +23,7 @@ class FileHandler:
     File handler methods
     """
 
-    _file_handlers = [ArchiveHandler(), PdfHandler(), PostscriptHandler(), XmlHandler()]
+    _file_handlers = [ArchiveHandler(), PdfHandler(), PostscriptHandler(), TexHandler(), XmlHandler()]
 
     @staticmethod
     def get_metadata(file_path: str, hash_types: list[HashType]) -> dict:

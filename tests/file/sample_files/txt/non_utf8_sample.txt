@@ -1,0 +1,1 @@
+This is a sample text with non-UTF-8 encoding. Here is a special character: ¥
