@@ -17,12 +17,40 @@ def test_enum_members_exist():
     assert hasattr(FileType, 'FILE_TYPE_ARCHIVE_TAR')
     assert hasattr(FileType, 'FILE_TYPE_ARCHIVE_TGZ')
 
+    assert hasattr(FileType, 'FILE_TYPE_IMAGE_BMP')
+    assert hasattr(FileType, 'FILE_TYPE_IMAGE_GIF')
+    assert hasattr(FileType, 'FILE_TYPE_IMAGE_ICO')
+    assert hasattr(FileType, 'FILE_TYPE_IMAGE_JPG')
+    assert hasattr(FileType, 'FILE_TYPE_IMAGE_PNG')
+    assert hasattr(FileType, 'FILE_TYPE_IMAGE_SVG')
+    assert hasattr(FileType, 'FILE_TYPE_IMAGE_TIFF')
+
+    assert hasattr(FileType, 'FILE_TYPE_TEX_AUX')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_BBL')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_BIB')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_BST')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_CLO')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_CLS')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_DVI')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_FIG')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_LOG')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_PSTEX')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_PSTEX_T')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_STY')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_SYNCTEX')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_TEX')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_LATEX_209_MAIN')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_LATEX_2E_MAIN')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_TIKZ')
+    assert hasattr(FileType, 'FILE_TYPE_TEX_TOC')
 
     assert hasattr(FileType, 'FILE_TYPE_PDF')
+
     assert hasattr(FileType, 'FILE_TYPE_POSTSCRIPT_PS')
     assert hasattr(FileType, 'FILE_TYPE_POSTSCRIPT_EPS')
     assert hasattr(FileType, 'FILE_TYPE_POSTSCRIPT_EPSF')
     assert hasattr(FileType, 'FILE_TYPE_POSTSCRIPT_EPSI')
+
     assert hasattr(FileType, 'FILE_TYPE_XML')
 
 def test_enum_values():
@@ -34,6 +62,14 @@ def test_enum_values():
     assert FileType.FILE_TYPE_ARCHIVE_GZ.value == 'ARCHIVE_GZ'
     assert FileType.FILE_TYPE_ARCHIVE_TAR.value == 'ARCHIVE_TAR'
     assert FileType.FILE_TYPE_ARCHIVE_TGZ.value == 'ARCHIVE_TGZ'
+
+    assert FileType.FILE_TYPE_IMAGE_BMP.value == 'IMAGE_BMP'
+    assert FileType.FILE_TYPE_IMAGE_GIF.value == 'IMAGE_GIF'
+    assert FileType.FILE_TYPE_IMAGE_ICO.value == 'IMAGE_ICO'
+    assert FileType.FILE_TYPE_IMAGE_JPG.value == 'IMAGE_JPG'
+    assert FileType.FILE_TYPE_IMAGE_PNG.value == 'IMAGE_PNG'
+    assert FileType.FILE_TYPE_IMAGE_SVG.value == 'IMAGE_SVG'
+    assert FileType.FILE_TYPE_IMAGE_TIFF.value == 'IMAGE_TIFF'
 
     assert FileType.FILE_TYPE_PDF.value == 'PDF'
     assert FileType.FILE_TYPE_POSTSCRIPT_PS.value == 'POSTSCRIPT_PS'
@@ -68,32 +104,39 @@ def test_enum_no_extra_members():
 
     expected_members = {
         'FILE_TYPE_ARCHIVE_GZ',
-        'FILE_TYPE_ARCHIVE_TAR',
-        'FILE_TYPE_ARCHIVE_TGZ',
-        'FILE_TYPE_PDF',
-        'FILE_TYPE_POSTSCRIPT_EPS',
-        'FILE_TYPE_POSTSCRIPT_EPSF',
-        'FILE_TYPE_POSTSCRIPT_EPSI',
-        'FILE_TYPE_POSTSCRIPT_PS',
-        'FILE_TYPE_TEX_AUX',
-        'FILE_TYPE_TEX_BBL',
-        'FILE_TYPE_TEX_BIB',
-        'FILE_TYPE_TEX_BST',
-        'FILE_TYPE_TEX_CLO',
-        'FILE_TYPE_TEX_CLS',
-        'FILE_TYPE_TEX_DVI',
-        'FILE_TYPE_TEX_FIG',
-        'FILE_TYPE_TEX_LATEX_209_MAIN',
-        'FILE_TYPE_TEX_LATEX_2E_MAIN',
-        'FILE_TYPE_TEX_LOG',
-        'FILE_TYPE_TEX_PSTEX',
-        'FILE_TYPE_TEX_PSTEX_T',
-        'FILE_TYPE_TEX_STY',
-        'FILE_TYPE_TEX_SYNCTEX',
-        'FILE_TYPE_TEX_TEX',
-        'FILE_TYPE_TEX_TIKZ',
-        'FILE_TYPE_TEX_TOC',
-        'FILE_TYPE_UNKNOWN',
-        'FILE_TYPE_XML' }
+         'FILE_TYPE_ARCHIVE_TAR',
+         'FILE_TYPE_ARCHIVE_TGZ',
+         'FILE_TYPE_IMAGE_BMP',
+         'FILE_TYPE_IMAGE_GIF',
+         'FILE_TYPE_IMAGE_ICO',
+         'FILE_TYPE_IMAGE_JPG',
+         'FILE_TYPE_IMAGE_PNG',
+         'FILE_TYPE_IMAGE_SVG',
+         'FILE_TYPE_IMAGE_TIFF',
+         'FILE_TYPE_PDF',
+         'FILE_TYPE_POSTSCRIPT_EPS',
+         'FILE_TYPE_POSTSCRIPT_EPSF',
+         'FILE_TYPE_POSTSCRIPT_EPSI',
+         'FILE_TYPE_POSTSCRIPT_PS',
+         'FILE_TYPE_TEX_AUX',
+         'FILE_TYPE_TEX_BBL',
+         'FILE_TYPE_TEX_BIB',
+         'FILE_TYPE_TEX_BST',
+         'FILE_TYPE_TEX_CLO',
+         'FILE_TYPE_TEX_CLS',
+         'FILE_TYPE_TEX_DVI',
+         'FILE_TYPE_TEX_FIG',
+         'FILE_TYPE_TEX_LATEX_209_MAIN',
+         'FILE_TYPE_TEX_LATEX_2E_MAIN',
+         'FILE_TYPE_TEX_LOG',
+         'FILE_TYPE_TEX_PSTEX',
+         'FILE_TYPE_TEX_PSTEX_T',
+         'FILE_TYPE_TEX_STY',
+         'FILE_TYPE_TEX_SYNCTEX',
+         'FILE_TYPE_TEX_TEX',
+         'FILE_TYPE_TEX_TIKZ',
+         'FILE_TYPE_TEX_TOC',
+         'FILE_TYPE_UNKNOWN',
+         'FILE_TYPE_XML'}
     actual_members = set(FileType.__members__.keys())
     assert actual_members == expected_members, f"Unexpected members found: {actual_members - expected_members}"
