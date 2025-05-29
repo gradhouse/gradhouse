@@ -5,6 +5,7 @@
 # Licensed under the MIT License. See the LICENSE file for more details.
 
 from gradhouse.file.file_name import FileName
+from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType
 
 import gzip
@@ -78,7 +79,7 @@ class ArchiveHandler:
          :raises FileNotFoundError: If the file is not found.
          """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 
@@ -134,7 +135,7 @@ class ArchiveHandler:
         :raises FileNotFoundError: If the file is not found.
         """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 
@@ -157,7 +158,7 @@ class ArchiveHandler:
         :raises FileNotFoundError: If the file is not found.
         """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 
@@ -180,7 +181,7 @@ class ArchiveHandler:
         :raises FileNotFoundError: If the file is not found.
         """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 
@@ -248,7 +249,7 @@ class ArchiveHandler:
         :raises TypeError: If the file is not in tar format.
         """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 
@@ -272,7 +273,7 @@ class ArchiveHandler:
         :raises TypeError: If the file is not in tgz format.
         """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 
@@ -295,7 +296,7 @@ class ArchiveHandler:
         :raises TypeError: If the file is not in gzip format.
         """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 
@@ -336,11 +337,11 @@ class ArchiveHandler:
         """
 
         error_log = []
-        is_file_found = os.path.isfile(source_file_path)
+        is_file_found = FileSystem.is_file(source_file_path)
         if not is_file_found:
             error_log.append('file not found')
 
-        is_directory = os.path.isdir(destination_directory)
+        is_directory = FileSystem.is_directory(destination_directory)
         if not is_directory:
             error_log.append('destination directory not found')
 
@@ -359,7 +360,7 @@ class ArchiveHandler:
             if is_unique_names and is_valid_filenames:
                 for contents_filename in file_contents:
                     destination_filename = os.path.join(destination_directory, contents_filename)
-                    is_destination_file_found = os.path.isfile(destination_filename)
+                    is_destination_file_found = FileSystem.is_file(destination_filename)
                     if is_destination_file_found:
                         error_log.append('destination file already exists')
                         break

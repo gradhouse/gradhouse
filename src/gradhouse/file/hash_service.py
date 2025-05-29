@@ -5,7 +5,7 @@
 # Licensed under the MIT License. See the LICENSE file for more details.
 
 from enum import Enum
-import os
+from gradhouse.file.file_system import FileSystem
 from hashlib import md5, sha256, sha512, sha3_512
 
 
@@ -93,7 +93,7 @@ class HashService:
         if not is_encoder_available:
             raise ValueError('hash type must be an allowed value')
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 

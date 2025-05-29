@@ -13,6 +13,7 @@
 # - https://info.arxiv.org/help/bulk_data_s3.html
 
 import pytest
+from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType
 from gradhouse.arxiv.patterns import Patterns
 
@@ -420,11 +421,11 @@ def test_check_bulk_archive_and_is_bulk_archive_valid_basic(file_path, expected_
     """
     Test check_bulk_archive and is_bulk_archive_valid for basic error cases.
     """
-    # Mock os.path.isfile to simulate file existence for the second case
+    # Mock FileSystem.is_file to simulate file existence for the second case
     if file_path == "arXiv_src_9902_005.tar":
-        mocker.patch("os.path.isfile", return_value=False)
+        mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=False)
     else:
-        mocker.patch("os.path.isfile", return_value=True)
+        mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
 
     # Mock FileHandler methods to avoid dependency on actual files
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension",
@@ -443,7 +444,7 @@ def test_check_bulk_archive_and_is_bulk_archive_valid_success(mocker):
     Test check_bulk_archive and is_bulk_archive_valid for a fully valid bulk archive file.
     """
     file_path = "arXiv_src_9902_005.tar"
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension",
                  return_value=[FileType.FILE_TYPE_ARCHIVE_TAR])
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format",
@@ -460,7 +461,7 @@ def test_check_bulk_archive_invalid_archive_contents(mocker):
     Test check_bulk_archive for a valid archive file with invalid contents.
     """
     file_path = "arXiv_src_9902_005.tar"
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension",
                  return_value=[FileType.FILE_TYPE_ARCHIVE_TAR])
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format",
@@ -478,7 +479,7 @@ def test_check_bulk_archive_extension_not_tar(mocker):
     Test check_bulk_archive when the file extension is not recognized as tar.
     """
     file_path = "arXiv_src_9902_005.tar"
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     # Simulate extension is not tar
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension", return_value=[])
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format", return_value=FileType.FILE_TYPE_ARCHIVE_TAR)
@@ -494,7 +495,7 @@ def test_check_bulk_archive_format_not_tar(mocker):
     Test check_bulk_archive when the file format is not tar, even though the extension is correct.
     """
     file_path = "arXiv_src_9902_005.tar"
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     # Simulate extension is tar, but format is not tar
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension", return_value=[FileType.FILE_TYPE_ARCHIVE_TAR])
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format", return_value="not_tar")
@@ -534,8 +535,8 @@ def test_check_submission_and_is_submission_valid(
     """
     # Mock Patterns.is_submission_filename
     mocker.patch("gradhouse.arxiv.patterns.Patterns.is_submission_filename", return_value=pattern_valid)
-    # Mock os.path.isfile
-    mocker.patch("os.path.isfile", return_value=file_exists)
+    # Mock FileSystem.is_file
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=file_exists)
     # Mock FileHandler.get_file_type_from_extension
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension", return_value=ext_types)
     # Mock FileHandler.get_file_type_from_format
@@ -553,7 +554,7 @@ def test_check_submission_archive_extraction_only_if_archive(mocker):
     """
     file_path = "1202.3054.pdf"
     mocker.patch("gradhouse.arxiv.patterns.Patterns.is_submission_filename", return_value=True)
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_extension", return_value=[FileType.FILE_TYPE_PDF])
     mocker.patch("gradhouse.file.file_handler.FileHandler.get_file_type_from_format", return_value=FileType.FILE_TYPE_PDF)
     # Should not call check_extract_possible for PDF

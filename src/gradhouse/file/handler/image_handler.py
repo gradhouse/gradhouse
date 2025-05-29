@@ -7,6 +7,7 @@
 import os
 from PIL import Image
 
+from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType
 
 
@@ -70,7 +71,7 @@ class ImageHandler:
         :raises IOError: If the file cannot be opened or read.
         """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 

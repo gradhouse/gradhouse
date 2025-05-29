@@ -8,6 +8,7 @@ import os
 import xml.etree.ElementTree as xml_element_tree_implementation
 import xmltodict as xmltodict_implementation
 
+from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType
 
 
@@ -70,7 +71,7 @@ class XmlHandler:
         :raises FileNotFoundError: If the file is not found.
         """
 
-        if not os.path.isfile(file_path):
+        if not FileSystem.is_file(file_path):
             raise FileNotFoundError('file not found')
 
         try:
@@ -94,7 +95,7 @@ class XmlHandler:
         :raises ValueError: If the XML content cannot be parsed.
         """
 
-        if not os.path.isfile(file_path):
+        if not FileSystem.is_file(file_path):
             raise FileNotFoundError('file not found')
 
         if not XmlHandler.is_xml_format(file_path):
