@@ -15,9 +15,9 @@
 from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 from zoneinfo import ZoneInfo
 
+from gradhouse.file.file_system import FileSystem
 from gradhouse.file.handler.xml_handler import XmlHandler
 
 
@@ -117,7 +117,7 @@ class Manifest:
 
         self.clear()
 
-        if not os.path.isfile(file_path):
+        if not FileSystem.is_file(file_path):
             raise FileNotFoundError('file not found')
 
         if not XmlHandler.is_xml_format(file_path):

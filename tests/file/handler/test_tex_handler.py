@@ -75,8 +75,6 @@ def test_get_file_type_from_format_raise_file_not_found():
 def test_get_file_extension_map():
     """
     Test that get_file_extension_map returns the correct file extension map.
-
-    :verifies: REQ-400034
     """
     expected_map = {
         '.aux': [FileType.FILE_TYPE_TEX_AUX],

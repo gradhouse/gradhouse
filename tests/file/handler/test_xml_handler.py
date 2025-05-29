@@ -8,6 +8,7 @@ import os
 import tempfile
 import pytest
 
+from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType
 from gradhouse.file.handler.xml_handler import XmlHandler
 
@@ -117,10 +118,10 @@ def test_is_xml_format_file_not_found(mocker):
     """
     Test the is_xml_format method when the file does not exist.
 
-    This test mocks the os.path.isfile method to return False and verifies that
+    This test mocks the FileSystem.is_file method to return False and verifies that
     the method raises a FileNotFoundError when the file is not found.
     """
-    mocker.patch("os.path.isfile", return_value=False)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=False)
     with pytest.raises(FileNotFoundError):
         XmlHandler.is_xml_format("non_existent_file.xml")
 
@@ -134,7 +135,7 @@ def test_is_xml_format_with_mocked_file(mocker):
     """
     mock_data = "<root><child>Test</child></root>"
     mocker.patch("builtins.open", mocker.mock_open(read_data=mock_data))
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     assert XmlHandler.is_xml_format("mocked_file.xml") is True
 
 
@@ -147,14 +148,14 @@ def test_is_xml_format_with_mocked_invalid_xml(mocker):
     """
     mock_data = "<root><child>Test</child>"  # Missing closing tag
     mocker.patch("builtins.open", mocker.mock_open(read_data=mock_data))
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     assert XmlHandler.is_xml_format("mocked_file.xml") is False
 
 def test_read_xml_to_dict_file_not_found(mocker):
     """
     Test that read_xml_to_dict raises FileNotFoundError when the file does not exist.
     """
-    mocker.patch("os.path.isfile", return_value=False)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=False)
     with pytest.raises(FileNotFoundError, match="file not found"):
         XmlHandler.read_xml_to_dict("non_existent_file.xml")
 
@@ -163,7 +164,7 @@ def test_read_xml_to_dict_not_xml_format(mocker):
     """
     Test that read_xml_to_dict raises TypeError when the file is not in XML format.
     """
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     mocker.patch("gradhouse.file.handler.xml_handler.XmlHandler.is_xml_format", return_value=False)
     with pytest.raises(TypeError, match="file not in XML format"):
         XmlHandler.read_xml_to_dict("not_xml_file.xml")
@@ -173,7 +174,7 @@ def test_read_xml_to_dict_valid_xml(mocker):
     """
     Test that read_xml_to_dict correctly parses valid XML content into a dictionary.
     """
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     mocker.patch("gradhouse.file.handler.xml_handler.XmlHandler.is_xml_format", return_value=True)
     mocker.patch("builtins.open", mocker.mock_open(read_data="<root><child>Test</child></root>"))
     mock_xmltodict = mocker.patch("gradhouse.file.handler.xml_handler.xmltodict_implementation.parse", return_value={"root": {"child": "Test"}})
@@ -187,7 +188,7 @@ def test_read_xml_to_dict_invalid_xml_parsing(mocker):
     """
     Test that read_xml_to_dict raises ValueError when XML parsing fails.
     """
-    mocker.patch("os.path.isfile", return_value=True)
+    mocker.patch("gradhouse.file.file_system.FileSystem.is_file", return_value=True)
     mocker.patch("gradhouse.file.handler.xml_handler.XmlHandler.is_xml_format", return_value=True)
     mocker.patch("builtins.open", mocker.mock_open(read_data="<root><child>Test</child>"))  # Malformed XML
     mocker.patch("gradhouse.file.handler.xml_handler.xmltodict_implementation.parse", side_effect=Exception("Parsing error"))

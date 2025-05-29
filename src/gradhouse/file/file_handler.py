@@ -4,11 +4,9 @@
 # Copyright (c) 2025 Jason Stuber
 # Licensed under the MIT License. See the LICENSE file for more details.
 
-from datetime import datetime, timezone
-import os
-
 from gradhouse.file.hash_service import HashType, HashService
 from gradhouse.file.file_name import FileName
+from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType
 
 from gradhouse.file.handler.archive_handler import ArchiveHandler
@@ -45,18 +43,17 @@ class FileHandler:
         :raises FileNotFoundError: If the file is not found.
         """
 
-        if not os.path.isfile(file_path):
+        if not FileSystem.is_file(file_path):
             raise FileNotFoundError('file not found')
 
         metadata = dict()
 
-        metadata['filename'] = os.path.basename(file_path)
-        metadata['size_bytes'] = os.path.getsize(file_path)
+        metadata['filename'] = FileName.get_file_basename(file_path)
+        metadata['size_bytes'] = FileSystem.get_file_size(file_path)
         metadata['hash'] = {}
         for hash_type in hash_types:
             metadata['hash'][hash_type.value] = HashService.calculate_file_hash(file_path, hash_type)
-        last_modified_timestamp = os.stat(file_path).st_mtime
-        metadata['timestamp_iso'] = datetime.fromtimestamp(last_modified_timestamp, timezone.utc).isoformat()
+        metadata['timestamp_iso'] = FileSystem.get_file_timestamp(file_path)
         metadata['file_type'] = FileHandler.get_file_type_from_format(file_path).value
 
         return metadata
@@ -89,7 +86,7 @@ class FileHandler:
         :raises FileNotFoundError: If the file is not found.
         """
 
-        is_file_found = os.path.isfile(file_path)
+        is_file_found = FileSystem.is_file(file_path)
         if not is_file_found:
             raise FileNotFoundError('file not found')
 

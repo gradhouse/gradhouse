@@ -16,6 +16,8 @@ import os
 import re
 
 from gradhouse.file.file_handler import FileHandler
+from gradhouse.file.file_name import FileName
+from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType
 from gradhouse.file.handler.archive_handler import ArchiveHandler
 
@@ -43,7 +45,7 @@ class Patterns:
             If the filename does not match the pattern then None is returned.
         """
 
-        basename = os.path.basename(filename)
+        basename = FileName.get_file_basename(filename)
         match = re.match(r'^arXiv_src_(\d{2})(\d{2})_(\d{3})\.tar$', basename)
         result = None
         if match:
@@ -89,7 +91,7 @@ class Patterns:
         if not Patterns.is_bulk_archive_filename(filename):
             raise ValueError(f"Filename {filename} does not match arXiv bulk archive naming scheme")
 
-        base_filename = os.path.basename(filename)
+        base_filename = FileName.get_file_basename(filename)
         return f"{base_uri}{base_filename}"
 
     @staticmethod
@@ -114,7 +116,7 @@ class Patterns:
         :return: tuple (category, yy, mm, number) if the filename matches the pattern, else None
         """
 
-        basename = os.path.basename(filename)
+        basename = FileName.get_file_basename(filename)
         basename_no_ext, ext = os.path.splitext(basename)
         result = None
         if ext in {'.gz', '.pdf'}:
@@ -144,7 +146,7 @@ class Patterns:
         :param filename: str, the submission filename (may include a path)
         :return: tuple (yy, mm, number) if the filename matches the pattern, else None
         """
-        basename = os.path.basename(filename)
+        basename = FileName.get_file_basename(filename)
         basename_no_ext, ext = os.path.splitext(basename)
         result = None
         if ext in {'.gz', '.pdf'}:
@@ -240,7 +242,7 @@ class Patterns:
 
         # Check file existence only if pattern is valid
         if not error_list:
-            if not os.path.isfile(file_path):
+            if not FileSystem.is_file(file_path):
                 error_list.append(f'File {file_path} not found')
 
         # Check file type only if previous checks passed
@@ -304,7 +306,7 @@ class Patterns:
 
         # Check file existence only if pattern is valid
         if not error_list:
-            if not os.path.isfile(file_path):
+            if not FileSystem.is_file(file_path):
                 error_list.append(f'File {file_path} not found')
 
         # Check file type only if previous checks passed
