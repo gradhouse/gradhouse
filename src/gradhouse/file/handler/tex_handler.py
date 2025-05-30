@@ -57,31 +57,6 @@ class TexHandler:
         return TexHandler._file_extension_map.get(file_extension.lower(), [FileType.FILE_TYPE_UNKNOWN])
 
     @staticmethod
-    def is_utf8_encoded(file_path: str) -> bool:
-        """
-        Determine if the file is UTF-8 encoded.
-
-        :param file_path: str, path to the file
-        :return: bool, True if the file is UTF-8 encoded, otherwise False
-
-        :raises FileNotFoundError: If the file is not found.
-        """
-
-        is_file_found = FileSystem.is_file(file_path)
-        if not is_file_found:
-            raise FileNotFoundError('file not found')
-
-        try:
-            with open(file_path, 'rb') as file:
-                raw_data = file.read()
-                raw_data.decode('utf-8')
-            is_utf8 = True
-        except UnicodeDecodeError:
-            is_utf8 = False
-
-        return is_utf8
-
-    @staticmethod
     def get_file_type_from_format(file_path: str) -> FileType:
         """
         Determine the file type from the file format.
@@ -97,7 +72,7 @@ class TexHandler:
         if not is_file_found:
             raise FileNotFoundError('file not found')
 
-        is_utf8 = TexHandler.is_utf8_encoded(file_path)
+        is_utf8 = FileSystem.is_utf8_encoded(file_path)
         if is_utf8:
             latex2e_main_required_patterns = ['\\documentclass', '\\begin{document}', '\\end{document}']
             latex209_main_required_patterns = ['\\documentstyle', '\\begin{document}', '\\end{document}']

@@ -4,6 +4,7 @@
 # Copyright (c) 2025 Jason Stuber
 # Licensed under the MIT License. See the LICENSE file for more details.
 
+import json
 import pytest
 from gradhouse.registry.registry import Registry
 
@@ -144,3 +145,28 @@ def test_len():
     assert len(reg) == 2
     reg.delete_entry("key1")
     assert len(reg) == 1
+
+def test_save(tmp_path):
+    reg = Registry()
+    reg._registry = {'abc': {'foo': 'bar'}, 'def': {'baz': 42}}
+    file_path = tmp_path / "test.json"
+    reg.save(str(file_path))
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    assert data == reg._registry
+
+def test_load(tmp_path, monkeypatch):
+    reg = Registry()
+    file_path = tmp_path / "test.json"
+    data = {"abc": {"foo": "bar"}}
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f)
+    monkeypatch.setattr("gradhouse.file.file_system.FileSystem.is_file", lambda path: True)
+    reg.load(str(file_path))
+    assert reg._registry == data
+
+def test_load_file_not_found(monkeypatch):
+    reg = Registry()
+    monkeypatch.setattr("gradhouse.file.file_system.FileSystem.is_file", lambda path: False)
+    with pytest.raises(FileNotFoundError):
+        reg.load("missing.json")

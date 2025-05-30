@@ -101,33 +101,3 @@ def test_get_file_extension_map():
 
     assert isinstance(result, dict), "The result should be a dictionary."
     assert result == expected_map, "The returned file extension map is incorrect."
-
-def test_is_utf8_encoded():
-    """
-    Test the is_utf8_encoded method
-    """
-
-    # test case: file is UTF-8 encoded
-    file_path = os.path.join(TEST_DATA_DIRECTORY, 'txt/text_file.txt')
-    is_utf8 = TexHandler.is_utf8_encoded(file_path)
-    assert is_utf8
-
-    # test case: file is not UTF-8 encoded
-    file_path = os.path.join(TEST_DATA_DIRECTORY, 'txt/non_utf8_sample.txt')
-    is_utf8 = TexHandler.is_utf8_encoded(file_path)
-    assert not is_utf8
-
-def test_is_utf8_encoded_raise_file_not_found():
-    """
-    Test the is_utf8_encoded method when the file is not found or the path directs to a non-file
-    """
-
-    # test case: directory, get_size is only for files
-    file_path = TEST_DATA_DIRECTORY
-    with pytest.raises(FileNotFoundError):
-        TexHandler.is_utf8_encoded(file_path)
-
-    # test case: file not found
-    file_path = 'this_is_not_a_file'
-    with pytest.raises(FileNotFoundError):
-        TexHandler.is_utf8_encoded(file_path)
