@@ -5,6 +5,10 @@
 # Licensed under the MIT License. See the LICENSE file for more details.
 
 import copy
+import json
+
+from gradhouse.file.file_system import FileSystem
+
 
 class Registry:
     """
@@ -95,3 +99,30 @@ class Registry:
         Return the number of entries in the registry.
         """
         return len(self._registry)
+
+    def save(self, file_path: str) -> None:
+        """
+        Save the registry to a JSON file.
+
+        :param file_path: str, the path to the output JSON file.
+        """
+
+        with open(file_path, 'w', encoding='utf-8') as file_handle:
+            json.dump(self._registry, file_handle, indent=4)
+
+    def load(self, filepath: str) -> None:
+        """
+        Load the registry from a JSON file.
+
+        :param filepath: str, the path to the input JSON file.
+
+        :raises FileNotFoundError: If the file does not exist.
+        """
+
+        self.clear()
+
+        if not FileSystem.is_file(filepath):
+            raise FileNotFoundError(f"File '{filepath}' not found.")
+
+        with open(filepath, 'r', encoding='utf-8') as file_handle:
+            self._registry = json.load(file_handle)

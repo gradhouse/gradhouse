@@ -295,6 +295,7 @@ class Patterns:
         :param file_path: str, path to the submission file to validate.
         :return: list[str], a list of error messages. If the list is empty, the file is considered valid.
         """
+
         allowed_file_types = [FileType.FILE_TYPE_ARCHIVE_GZ, FileType.FILE_TYPE_ARCHIVE_TGZ, FileType.FILE_TYPE_PDF]
         allowed_archive_file_types = [FileType.FILE_TYPE_ARCHIVE_GZ, FileType.FILE_TYPE_ARCHIVE_TGZ]
 
