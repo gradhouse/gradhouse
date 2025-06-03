@@ -55,9 +55,9 @@ class S3Client:
         the copy operation using the AWS CLI with requester-pays enabled. If the operation
         fails or times out, a S3ClientError is raised.
 
-        :param source_uri: The full S3 URI of the object to copy (e.g., 's3://bucket/key').
-        :param destination_directory: The local file path where the object will be copied.
-        :param timeout: Optional timeout in seconds for the copy operation (default: 300).
+        :param source_uri: str,  The full S3 URI of the object to copy (e.g., 's3://bucket/key').
+        :param destination_directory: str, The local file path where the object will be copied.
+        :param timeout: int, optional timeout in seconds for the copy operation (default: 300).
 
         :raises ValueError: If the source_uri does not start with 's3://' or destination is invalid.
         :raises FileNotFoundError: If the destination directory does not exist.
@@ -94,10 +94,10 @@ class S3Client:
         with requester-pays enabled. The output is parsed into a list of dictionaries, each representing
         a file or subdirectory entry.
 
-        :param directory_uri: The full S3 URI of the directory to list (e.g., 's3://bucket/prefix/').
-        :param timeout: Optional timeout in seconds for the list operation (default: 60).
+        :param directory_uri: str, The full S3 URI of the directory to list (e.g., 's3://bucket/prefix/').
+        :param timeout: int, Optional timeout in seconds for the list operation (default: 60).
 
-        :return: List of dictionaries, each containing keys: 'date', 'time', 'size', and 'name'.
+        :return: list, List of dictionaries, each containing keys: 'date', 'time', 'size', and 'name'.
 
         :raises ValueError: If the directory_uri does not start with 's3://'.
         :raises S3ClientError: If the list operation fails or times out.
@@ -127,7 +127,7 @@ class S3Client:
         represent directories (date, time, name). The parsed entries are returned as a list of
         dictionaries with keys: 'date', 'time', 'size', and 'name'. For directories, 'size' is None.
 
-        :param output: The raw string output from the AWS CLI 'aws s3 ls' command.
+        :param output: str, the raw string output from the AWS CLI 'aws s3 ls' command.
 
         :return: List of dictionaries, each containing keys: 'date', 'time', 'size', and 'name'.
                  For directories, 'size' will be None.
