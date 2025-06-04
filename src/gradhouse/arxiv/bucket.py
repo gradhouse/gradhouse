@@ -1,5 +1,5 @@
-# File: patterns.py
-# Description: Methods for interacting with the arXiv AWS S3 bucket
+# File: bucket.py
+# Description: Methods for interacting with the arXiv AWS S3 source bucket
 #
 # Copyright (c) 2025 Jason Stuber
 # Licensed under the MIT License. See the LICENSE file for more details.
@@ -48,6 +48,7 @@ class Bucket:
         directory using the AWS CLI.
 
         :param bulk_archive_filename: str, the bulk archive filename that will be copied.
+            A valid bulk archive filename must match the pattern 'arXiv_src_{yymm}_{seq_num}.tar'
         :param destination_directory: str, the local file path where the bulk archive file will be copied.
         
         :raises ValueError: If the bulk archive filename is not identical to its basename.

@@ -4,7 +4,7 @@
 # Copyright (c) 2025 Jason Stuber
 # Licensed under the MIT License. See the LICENSE file for more details.
 
-from gradhouse.file.hash_service import HashType, HashService
+from gradhouse.services.hash_service import HashType, HashService
 from gradhouse.file.file_name import FileName
 from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType

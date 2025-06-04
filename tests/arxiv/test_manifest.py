@@ -50,7 +50,7 @@ def test_manifest_constructor():
     manifest = Manifest()
     assert manifest._manifest == {
         'metadata': {},
-        'contents': []
+        'contents': dict()
     }
 
 def test_manifest_clear():
@@ -69,7 +69,7 @@ def test_manifest_clear():
     # Assert that the manifest is reset to default values
     assert manifest._manifest == {
         'metadata': {},
-        'contents': []
+        'contents': dict()
     }
 
 def test_manifest_set_defaults():
@@ -80,7 +80,7 @@ def test_manifest_set_defaults():
     manifest = Manifest()
     # Modify the manifest to simulate existing data
     manifest._manifest['metadata'] = {'key': 'value'}
-    manifest._manifest['contents'] = [{'filename': 'test.txt'}]
+    manifest._manifest['contents'] = {'test.txt': {'filename': 'test.txt'}}
 
     # Call the _set_defaults method
     manifest._set_defaults()
@@ -88,7 +88,7 @@ def test_manifest_set_defaults():
     # Assert that the manifest is reset to default values
     assert manifest._manifest == {
         'metadata': {},
-        'contents': []
+        'contents': dict()
     }
 
 def test_is_arxiv_keys_present_with_valid_data():
@@ -424,8 +424,8 @@ def test_import_arxiv_xml_valid(valid_xml_file):
         'manifest_timestamp_iso': '2025-04-07T08:58:03+00:00'
     }
     assert len(manifest._manifest['contents']) == 2
-    assert manifest._manifest['contents'][0]['filename'] == 'src/arXiv_src_0001_001.tar'
-    assert manifest._manifest['contents'][1]['filename'] == 'src/arXiv_src_0002_001.tar'
+    assert manifest._manifest['contents']['src/arXiv_src_0001_001.tar']['filename'] == 'src/arXiv_src_0001_001.tar'
+    assert manifest._manifest['contents']['src/arXiv_src_0002_001.tar']['filename'] == 'src/arXiv_src_0002_001.tar'
 
 def test_import_arxiv_xml_file_not_found():
     """
@@ -505,8 +505,9 @@ def manifest_with_data():
             'manifest_filename': '20250411_arXiv_src_manifest.xml',
             'timestamp_iso': '2025-04-07T08:58:03+00:00'
         },
-        'contents': [
-            {'filename': 'src/arXiv_src_0001_001.tar',
+        'contents': {
+            'src/arXiv_src_0001_001.tar': {
+             'filename': 'src/arXiv_src_0001_001.tar',
              'size_bytes': 225605507,
              'timestamp_iso': '2010-12-23T05:13:59+00:00',
              'year': 2000,
@@ -515,7 +516,8 @@ def manifest_with_data():
              'n_submissions': 2364,
              'hash': {'MD5': '949ae880fbaf4649a485a8d9e07f370b',
                       'MD5_contents': 'cacbfede21d5dfef26f367ec99384546'}},
-            {'filename': 'src/arXiv_src_0002_001.tar',
+            'src/arXiv_src_0002_001.tar': {
+             'filename': 'src/arXiv_src_0002_001.tar',
              'size_bytes': 227036528,
              'timestamp_iso': '2010-12-23T05:18:09+00:00',
              'year': 2000,
@@ -524,7 +526,8 @@ def manifest_with_data():
              'n_submissions': 2365,
              'hash': {'MD5': '4592ab506cf775afecf4ad560d982a00',
                       'MD5_contents': 'd90df481661ccdd7e8be883796539743'}},
-            {'filename': 'src/arXiv_src_0003_001.tar',
+            'src/arXiv_src_0003_001.tar': {
+             'filename': 'src/arXiv_src_0003_001.tar',
              'size_bytes': 230986882,
              'timestamp_iso': '2010-12-23T05:22:15+00:00',
              'year': 2000,
@@ -533,7 +536,8 @@ def manifest_with_data():
              'n_submissions': 2600,
              'hash': {'MD5': 'b5bf5e52ae8532cdf82b606b42df16ea',
                       'MD5_contents': '3388afd7bfb2dfd9d3f3e6b353357b33'}},
-            {'filename': 'src/arXiv_src_0004_001.tar',
+            'src/arXiv_src_0004_001.tar': {
+             'filename': 'src/arXiv_src_0004_001.tar',
              'size_bytes': 191559408,
              'timestamp_iso': '2010-12-23T05:26:31+00:00',
              'year': 2000,
@@ -542,7 +546,8 @@ def manifest_with_data():
              'n_submissions': 2076,
              'hash': {'MD5': '9bf1b55890dceec9535ef723a2aea16b',
                       'MD5_contents': '46abb309d77065fed44965cc26a4ae2e'}},
-            {'filename': 'src/arXiv_src_0005_001.tar',
+            'src/arXiv_src_0005_001.tar': {
+             'filename': 'src/arXiv_src_0005_001.tar',
              'size_bytes': 255509072,
              'timestamp_iso': '2010-12-23T05:30:11+00:00',
              'year': 2000,
@@ -551,7 +556,7 @@ def manifest_with_data():
              'n_submissions': 2724,
              'hash': {'MD5': 'b49af416746146eca13c5a6a76bc7193',
                       'MD5_contents': 'ea665c7b62eaac91110fa344f6ba3fc4'}}
-        ]
+        }
     }
     return manifest
 
@@ -578,7 +583,7 @@ def test_get_statistics_empty_manifest():
     Test the get_statistics method with an empty manifest.
     """
     manifest = Manifest()
-    manifest._manifest = {'metadata': {}, 'contents': []}
+    manifest._manifest = {'metadata': {}, 'contents': dict()}
     statistics = manifest.get_statistics()
 
     assert statistics == {}
@@ -594,22 +599,24 @@ def manifest_with_duplicate_keys():
             'manifest_filename': '20250411_arXiv_src_manifest.xml',
             'timestamp_iso': '2025-04-07T08:58:03+00:00'
         },
-        'contents': [
-            {'filename': 'src/arXiv_src_0001_001.tar',
+        'contents': {
+            'src/arXiv_src_0001_001.tar': {
+             'filename': 'src/arXiv_src_0001_001.tar',
              'size_bytes': 225605507,
              'timestamp_iso': '2010-12-23T05:13:59+00:00',
              'year': 2025,
              'month': 1,
              'sequence_number': 1,
              'n_submissions': 2364},
-            {'filename': 'src/arXiv_src_0002_001.tar',
+            'src/arXiv_src_0002_001.tar': {
+             'filename': 'src/arXiv_src_0002_001.tar',
              'size_bytes': 227036528,
              'timestamp_iso': '2010-12-23T05:18:09+00:00',
              'year': 2025,
              'month': 1,
              'sequence_number': 2,
              'n_submissions': 1000},
-        ]
+        }
     }
     return manifest
 
@@ -707,8 +714,8 @@ def test_info(mocker):
         'metadata': {
             'manifest_timestamp_iso': '2025-04-07T08:58:03+00:00',
         },
-        'contents': [
-            {
+        'contents': {
+            'src/arXiv_src_0001_001.tar': {
                 'filename': 'src/arXiv_src_0001_001.tar',
                 'size_bytes': 225605507,
                 'timestamp_iso': '2010-12-23T05:13:59+00:00',
@@ -721,7 +728,7 @@ def test_info(mocker):
                     'MD5_contents': 'cacbfede21d5dfef26f367ec99384546'
                 }
             },
-            {
+            'src/arXiv_src_0002_001.tar': {
                 'filename': 'src/arXiv_src_0002_001.tar',
                 'size_bytes': 227036528,
                 'timestamp_iso': '2010-12-23T05:18:09+00:00',
@@ -734,7 +741,7 @@ def test_info(mocker):
                     'MD5_contents': 'd90df481661ccdd7e8be883796539743'
                 }
             }
-        ]
+        }
     }
 
     # Mock the print function to capture output
@@ -820,3 +827,248 @@ def test_import_arxiv_xml_invalid_format(monkeypatch, tmp_path):
     manifest = Manifest()
     with pytest.raises(TypeError, match="file is not in XML format."):
         manifest.import_arxiv_xml(str(file_path))
+
+class DummyFileSystemForDuplicate:
+    @staticmethod
+    def is_file(path):
+        return True
+
+class DummyXmlHandlerForDuplicate:
+    @staticmethod
+    def is_xml_format(path):
+        return True
+
+    @staticmethod
+    def read_xml_to_dict(path):
+        # Two entries with the same filename to trigger the KeyError
+        return {
+            'arXivSRC': {
+                'timestamp': 'Mon Apr  7 04:58:03 2025',
+                'file': [
+                    {
+                        'filename': 'src/arXiv_src_2504_001.tar',
+                        'size': '123',
+                        'timestamp': '2025-04-07 04:58:03',
+                        'yymm': '2504',
+                        'seq_num': '001',
+                        'num_items': '10',
+                        'md5sum': 'abc',
+                        'content_md5sum': 'def',
+                        'first_item': '1',
+                        'last_item': '10'
+                    },
+                    {
+                        'filename': 'src/arXiv_src_2504_001.tar',  # Duplicate filename
+                        'size': '456',
+                        'timestamp': '2025-04-07 05:00:00',
+                        'yymm': '2504',
+                        'seq_num': '001',
+                        'num_items': '20',
+                        'md5sum': 'ghi',
+                        'content_md5sum': 'jkl',
+                        'first_item': '11',
+                        'last_item': '30'
+                    }
+                ]
+            }
+        }
+
+@pytest.fixture
+def patch_manifest_dependencies_for_duplicate(monkeypatch):
+    monkeypatch.setattr("gradhouse.arxiv.manifest.FileSystem", DummyFileSystemForDuplicate)
+    monkeypatch.setattr("gradhouse.arxiv.manifest.XmlHandler", DummyXmlHandlerForDuplicate)
+
+def test_import_arxiv_xml_duplicate_filename_raises_keyerror(patch_manifest_dependencies_for_duplicate):
+    """
+    Test that Manifest.import_arxiv_xml raises KeyError when two file entries have identical filenames.
+    This hits the branch where duplicate filenames are detected.
+    """
+    manifest = Manifest()
+    with pytest.raises(KeyError, match="Bulk archive filenames not unique"):
+        manifest.import_arxiv_xml("dummy_path.xml")
+
+def test_list_keys():
+    """
+    Test listing all keys in the manifest.
+    """
+
+    manifest = Manifest()
+    manifest._manifest['contents']['key1'] = {"foo": "bar"}
+    manifest._manifest['contents']['key2'] = {"baz": "qux"}
+    keys = manifest.list_keys()
+    assert keys == {"key1", "key2"}
+
+class DummyTimeService:
+    @staticmethod
+    def is_iso_timestamp_newer(ts1, ts2):
+        # Simple string comparison for testing; real logic is in TimeService
+        return ts1 > ts2
+
+@pytest.fixture(autouse=True)
+def patch_time_service(monkeypatch):
+    # Patch TimeService used in Manifest
+    monkeypatch.setattr("gradhouse.arxiv.manifest.TimeService", DummyTimeService)
+
+def make_manifest(timestamp, keys):
+    """
+    Helper to create a Manifest with a given timestamp and set of keys.
+    """
+    m = Manifest()
+    m._manifest['metadata']['manifest_timestamp_iso'] = timestamp
+    m._manifest['contents'] = {k: {} for k in keys}
+    return m
+
+def test_is_newer_than_true():
+    """
+    Test that is_newer_than returns True when self is newer and has at least one new entry, no deletions.
+    """
+    m1 = make_manifest("2022-01-02T00:00:00+00:00", {"a", "b"})
+    m2 = make_manifest("2022-01-01T00:00:00+00:00", {"a"})
+    assert m1.is_newer_than(m2) is True
+
+def test_is_newer_than_false():
+    """
+    Test that is_newer_than returns False when self is older and the other has at least one new entry, no deletions.
+    """
+    m1 = make_manifest("2022-01-01T00:00:00+00:00", {"a"})
+    m2 = make_manifest("2022-01-02T00:00:00+00:00", {"a", "b"})
+    assert m1.is_newer_than(m2) is False
+
+def test_is_newer_than_equal():
+    """
+    Test that is_newer_than returns False when timestamps and keys are identical.
+    """
+    m1 = make_manifest("2022-01-01T00:00:00+00:00", {"a", "b"})
+    m2 = make_manifest("2022-01-01T00:00:00+00:00", {"a", "b"})
+    assert m1.is_newer_than(m2) is False
+
+def test_is_newer_than_identical_time_different_keys():
+    """
+    Test that is_newer_than raises ValueError if timestamps are equal but keys differ.
+    """
+    m1 = make_manifest("2022-01-01T00:00:00+00:00", {"a", "b"})
+    m2 = make_manifest("2022-01-01T00:00:00+00:00", {"a"})
+    with pytest.raises(ValueError, match="identical times must have identical keys"):
+        m1.is_newer_than(m2)
+
+def test_is_newer_than_newer_manifest_no_new_entries():
+    """
+    Test that is_newer_than raises ValueError if self is newer but has no new entries.
+    """
+    m1 = make_manifest("2022-01-02T00:00:00+00:00", {"a"})
+    m2 = make_manifest("2022-01-01T00:00:00+00:00", {"a"})
+    with pytest.raises(ValueError, match="must have at least one new entry"):
+        m1.is_newer_than(m2)
+
+def test_is_newer_than_newer_manifest_with_deletions():
+    """
+    Test that is_newer_than raises ValueError if self is newer but has deleted entries.
+    """
+    m1 = make_manifest("2022-01-02T00:00:00+00:00", {"a"})         # newer, but missing "b"
+    m2 = make_manifest("2022-01-01T00:00:00+00:00", {"a", "b"})    # older, has "a" and "b"
+    with pytest.raises(ValueError, match="Inconsistent manifest metadata, newer manifest must have at least one new entry"):
+        m1.is_newer_than(m2)
+
+def test_is_newer_than_older_manifest_no_new_entries():
+    """
+    Test that is_newer_than raises ValueError if self is older but the other has no new entries.
+    """
+    m1 = make_manifest("2022-01-01T00:00:00+00:00", {"a"})
+    m2 = make_manifest("2022-01-02T00:00:00+00:00", {"a"})
+    with pytest.raises(ValueError, match="must have at least one new entry"):
+        m1.is_newer_than(m2)
+
+def test_is_newer_than_older_manifest_with_deletions():
+    """
+    Test that is_newer_than raises ValueError if self is older but has deleted entries compared to the other.
+    """
+    m1 = make_manifest("2022-01-01T00:00:00+00:00", {"a", "b"})
+    m2 = make_manifest("2022-01-02T00:00:00+00:00", {"a"})
+    with pytest.raises(ValueError, match="Inconsistent manifest metadata, newer manifest must have at least one new entry"):
+        m1.is_newer_than(m2)
+
+def test_is_newer_than_newer_manifest_new_entries_but_deleted_key():
+    """
+    Test that is_newer_than raises ValueError (line 154) if self is newer but has no new entries compared to other,
+    and both have different keys (e.g., self: {'a', 'b'}, other: {'b', 'c'}).
+    """
+    m1 = make_manifest("2022-01-02T00:00:00+00:00", {"a", "b"})  # newer
+    m2 = make_manifest("2022-01-01T00:00:00+00:00", {"b", "c"})  # older
+    with pytest.raises(ValueError, match="cannot have entries deleted"):
+        m1.is_newer_than(m2)
+
+def test_is_newer_than_older_manifest_deleted_key_but_newer_entries():
+    """
+    Test that is_newer_than raises ValueError (line 154) if self is newer but has no new entries compared to other,
+    and both have different keys (e.g., self: {'a', 'b'}, other: {'b', 'c'}).
+    """
+    m1 = make_manifest("2022-01-01T00:00:00+00:00", {"a", "b"})  # newer
+    m2 = make_manifest("2022-01-02T00:00:00+00:00", {"b", "c"})  # older
+    with pytest.raises(ValueError, match="cannot have entries deleted"):
+        m1.is_newer_than(m2)
+
+class UniqueDummyTimeService:
+    @staticmethod
+    def is_iso_timestamp_newer(ts1, ts2):
+        return ts1 > ts2
+
+@pytest.fixture
+def patch_time_service_unique(monkeypatch):
+    monkeypatch.setattr("gradhouse.arxiv.manifest.TimeService", UniqueDummyTimeService)
+
+def make_manifest_with_hashes_unique(timestamp, entries):
+    """
+    Helper to create a Manifest with a given timestamp and a dict of entries:
+    entries: dict of {filename: md5_hash}
+    """
+    m = Manifest()
+    m._manifest['metadata']['manifest_timestamp_iso'] = timestamp
+    m._manifest['contents'] = {
+        k: {'hash': {'MD5': v}} for k, v in entries.items()
+    }
+    return m
+
+def test_find_new_entries_returns_new_keys_unique(patch_time_service_unique):
+    """
+    Test that find_new_entries returns the set of keys present in self but not in the reference manifest.
+    """
+    m1 = make_manifest_with_hashes_unique("2022-01-02T00:00:00+00:00", {"a": "h1", "b": "h2"})
+    m2 = make_manifest_with_hashes_unique("2022-01-01T00:00:00+00:00", {"a": "h1"})
+    assert m1.find_new_entries(m2) == {"b"}
+
+def test_find_new_entries_raises_if_not_newer_unique(patch_time_service_unique):
+    """
+    Test that find_new_entries raises ValueError if self is not newer than the reference manifest.
+    """
+    m1 = make_manifest_with_hashes_unique("2022-01-01T00:00:00+00:00", {"a": "h1"})
+    m2 = make_manifest_with_hashes_unique("2022-01-02T00:00:00+00:00", {"a": "h1", "b": "h2"})
+    with pytest.raises(ValueError, match="Reference manifest must be older"):
+        m1.find_new_entries(m2)
+
+def test_find_updated_entries_returns_changed_keys_unique(patch_time_service_unique):
+    """
+    Test that find_updated_entries returns the set of keys present in both manifests but with different MD5 hashes.
+    """
+    # m1 is newer, has a new key "c" and "b" is changed
+    m1 = make_manifest_with_hashes_unique("2022-01-02T00:00:00+00:00", {"a": "h1", "b": "h2", "c": "h3"})
+    m2 = make_manifest_with_hashes_unique("2022-01-01T00:00:00+00:00", {"a": "h1", "b": "DIFFERENT"})
+    assert m1.find_updated_entries(m2) == {"b"}
+
+def test_find_updated_entries_empty_if_no_changes_unique(patch_time_service_unique):
+    """
+    Test that find_updated_entries returns an empty set if all common keys have the same MD5 hash,
+    and the newer manifest has at least one new key.
+    """
+    m1 = make_manifest_with_hashes_unique("2022-01-02T00:00:00+00:00", {"a": "h1", "b": "h2", "c": "h3"})
+    m2 = make_manifest_with_hashes_unique("2022-01-01T00:00:00+00:00", {"a": "h1", "b": "h2"})
+    assert m1.find_updated_entries(m2) == set()
+
+def test_find_updated_entries_raises_if_not_newer_unique(patch_time_service_unique):
+    """
+    Test that find_updated_entries raises ValueError if self is not newer than the reference manifest.
+    """
+    # m2 is newer and has a new key "b"
+    m1 = make_manifest_with_hashes_unique("2022-01-01T00:00:00+00:00", {"a": "h1"})
+    m2 = make_manifest_with_hashes_unique("2022-01-02T00:00:00+00:00", {"a": "h1", "b": "h2"})
+    with pytest.raises(ValueError, match="Reference manifest must be older"):
+        m1.find_updated_entries(m2)

@@ -13,9 +13,7 @@
 # - https://info.arxiv.org/help/bulk_data_s3.html
 
 import pytest
-from gradhouse.file.file_system import FileSystem
 from gradhouse.file.file_type import FileType
-from gradhouse.arxiv.patterns import Patterns
 
 @pytest.mark.parametrize(
     "filename,expected",

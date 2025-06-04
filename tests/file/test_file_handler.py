@@ -1,7 +1,7 @@
 import pytest
 from gradhouse.file.file_handler import FileHandler
 from gradhouse.file.file_type import FileType
-from gradhouse.file.hash_service import HashType, HashService
+from gradhouse.services.hash_service import HashType, HashService
 
 @pytest.fixture
 def mock_file(tmp_path):

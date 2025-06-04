@@ -9,7 +9,7 @@ import os
 import pytest
 import tempfile
 
-from gradhouse.file.hash_service import HashType, HashService
+from gradhouse.services.hash_service import HashType, HashService
 
 
 # Test for HashType
