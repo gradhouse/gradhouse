@@ -12,12 +12,15 @@
 # - https://arxiv.org/help/license
 # - https://info.arxiv.org/help/bulk_data_s3.html
 
+from __future__ import annotations
+
 from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 from zoneinfo import ZoneInfo
 
 from gradhouse.file.file_system import FileSystem
+from gradhouse.services.time_service import TimeService
 from gradhouse.file.handler.xml_handler import XmlHandler
 
 
@@ -35,7 +38,7 @@ class Manifest:
 
     The manifest is modeled as a dictionary with two main components:
         - 'metadata': General information about the manifest (e.g., version, date generated).
-        - 'contents': A list of dictionaries, each describing a specific bulk archive.
+        - 'contents': A dictionary with the keys as the bulk archive filename and value describing the bulk archive.
     """
 
     def __init__(self, arxiv_xml_file: str = None) -> None:
@@ -73,12 +76,22 @@ class Manifest:
 
         This private method initializes the manifest with the following structure:
           - 'metadata': An empty dictionary to hold metadata.
-          - 'contents': An empty list to hold content-related data.
+          - 'contents': An empty dictionary to hold content-related data.
         """
         self._manifest = {
             'metadata': {},
-            'contents': []
+            'contents': dict()
         }
+
+    def list_keys(self) -> set[str]:
+        """
+        Return a list of all keys in the manifest.
+        The manifest uses the bulk archive filenames as keys.
+
+        :return: set[str], set of keys in the manifest.
+        """
+
+        return set(self._manifest['contents'].keys())
 
     def info(self) -> None:
         """
@@ -93,8 +106,8 @@ class Manifest:
             print(f"  Manifest Timestamp: {metadata['manifest_timestamp_iso']}")  # last modified from XML
 
             num_bulk_archives = len(contents)
-            total_submissions = sum(entry['n_submissions'] for entry in contents)
-            total_size_bytes = sum(entry['size_bytes'] for entry in contents)
+            total_submissions = sum(entry['n_submissions'] for key, entry in contents.items())
+            total_size_bytes = sum(entry['size_bytes'] for key, entry in contents.items())
             total_size_gb = 1.0e-9 * total_size_bytes
             average_submission_size_mb = 1.0e-6 * (total_size_bytes / total_submissions)
 
@@ -102,6 +115,95 @@ class Manifest:
             print(f"Total Number of Submissions: {total_submissions}")
             print(f"Total Size: {total_size_gb:.3f} GB")
             print(f"Average Submission Size: {average_submission_size_mb:.3f} MB")
+
+    def is_newer_than(self, other_manifest: Manifest) -> bool:
+        """
+        Determine if this manifest is newer than another manifest by comparing their ISO 8601 timestamps
+        and number of entries.
+
+        :param other_manifest: Manifest, the manifest to compare against.
+        :return: bool, True if this manifest is newer than the other, otherwise False.
+
+        :raises ValueError: if the manifests have identical times but not identical keys
+        :raises ValueError: if the manifest with the newer timestamp does not add additional entries
+        :raises ValueError: if the manifest with the newer timestamp has entries deleted
+        """
+
+        iso_timestamp1 = self._manifest['metadata']['manifest_timestamp_iso']
+        iso_timestamp2 = other_manifest._manifest['metadata']['manifest_timestamp_iso']
+
+        current_keys = self.list_keys()
+        other_keys = other_manifest.list_keys()
+        common_keys = current_keys & other_keys
+        files_in_current_but_not_in_other = current_keys - common_keys
+        files_in_other_but_not_in_current = other_keys - common_keys
+
+        if iso_timestamp1 == iso_timestamp2:
+            is_timestamp_newer = False
+
+            if len(files_in_current_but_not_in_other) > 0 or (len(files_in_other_but_not_in_current) > 0):
+                raise ValueError('Inconsistent manifest metadata, manifests with identical times must have identical keys')
+
+        else:
+            is_timestamp_newer = TimeService.is_iso_timestamp_newer(iso_timestamp1, iso_timestamp2)
+
+            if is_timestamp_newer:
+                # current is newer timestamp
+                if len(files_in_current_but_not_in_other) == 0:
+                    raise ValueError('Inconsistent manifest metadata, newer manifest must have at least one new entry')
+                if len(files_in_other_but_not_in_current) > 0:
+                    raise ValueError('Inconsistent manifest metadata, newer manifest cannot have entries deleted')
+            else:
+                # other is newer timestamp
+                if len(files_in_other_but_not_in_current) == 0:
+                    raise ValueError('Inconsistent manifest metadata, newer manifest must have at least one new entry')
+                if len(files_in_current_but_not_in_other) > 0:
+                    raise ValueError('Inconsistent manifest metadata, newer manifest cannot have entries deleted')
+
+        return is_timestamp_newer
+
+    def find_new_entries(self, reference_manifest: Manifest) -> set[str]:
+        """
+        Find all keys in the current manifest that do not exist in the reference manifest.
+        The current manifest must be newer than the reference manifest.
+
+        :param reference_manifest: Manifest, the reference manifest.
+            This manifest must be older than the current manifest.
+        :return: set[str], set of keys in the current manifest that do not exist in the reference manifest.
+
+        :raises ValueError: if the reference manifest is not older than the current manifest.
+        """
+
+        if not self.is_newer_than(reference_manifest):
+            raise ValueError('Reference manifest must be older than the current manifest')
+
+        current_keys = self.list_keys()
+        reference_keys = reference_manifest.list_keys()
+        new_keys = current_keys - reference_keys
+        return new_keys
+
+    def find_updated_entries(self, reference_manifest: Manifest) -> set[str]:
+        """
+        Find all keys in the current manifest that are also in the reference manifest but different values.
+        Different values are identified using the MD5 hash.
+
+        :param reference_manifest: Manifest, the reference manifest.
+            This manifest must be older than the current manifest.
+        :return: set[str], set of keys in the current manifest that have different values compared to the reference.
+
+        :raises ValueError: if the reference manifest is not older than the current manifest.
+        """
+
+        if not self.is_newer_than(reference_manifest):
+            raise ValueError('Reference manifest must be older than the current manifest')
+
+        current_keys = self.list_keys()
+        reference_keys = reference_manifest.list_keys()
+        common_keys = current_keys & reference_keys
+        updated_keys = {key for key in common_keys if
+                        self._manifest['contents'][key]['hash']['MD5'] !=
+                        reference_manifest._manifest['contents'][key]['hash']['MD5']}
+        return updated_keys
 
     def import_arxiv_xml(self, file_path: str) -> None:
         """
@@ -113,6 +215,7 @@ class Manifest:
         :raises FileNotFoundError: If the file is not found.
         :raises TypeError: If the file is not in XML format.
         :raises ValueError: If entries are missing in arXiv XML file
+        :raises KeyError: If the bulk archive filenames are not unique and cannot be used as keys.
         """
 
         self.clear()
@@ -131,8 +234,13 @@ class Manifest:
         self._manifest['metadata']['manifest_timestamp_iso'] = (
             Manifest._convert_arxiv_timestamp_to_iso(xml_dict['arXivSRC']['timestamp']))
 
-        self._manifest['contents'] = [Manifest._process_file_entry(file_entry)
-                                      for file_entry in xml_dict['arXivSRC']['file']]
+        for file_entry in xml_dict['arXivSRC']['file']:
+            entry = Manifest._process_file_entry(file_entry)
+            filename = entry['filename']
+            if filename not in self._manifest['contents']:
+                self._manifest['contents'][filename] = entry
+            else:
+                raise KeyError('Bulk archive filenames not unique and cannot be used for keys')
 
     @staticmethod
     def _process_file_entry(file_entry: dict) -> dict:
@@ -290,7 +398,7 @@ class Manifest:
         """
 
         statistics = dict()
-        for entry in self._manifest['contents']:
+        for key, entry in self._manifest['contents'].items():
             key = (entry['year'], entry['month'])
             if key not in statistics:
                 statistics[key] = {'size_bytes': 0, 'n_submissions': 0}

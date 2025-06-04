@@ -1,4 +1,4 @@
-# File: test_manifest.py
+# File: test_bucket.py
 # Description: Unit tests for the Bucket class.
 #
 # Copyright (c) 2025 Jason Stuber
