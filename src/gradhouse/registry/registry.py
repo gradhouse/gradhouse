@@ -110,19 +110,19 @@ class Registry:
         with open(file_path, 'w', encoding='utf-8') as file_handle:
             json.dump(self._registry, file_handle, indent=4)
 
-    def load(self, filepath: str) -> None:
+    def load(self, file_path: str) -> None:
         """
         Load the registry from a JSON file.
 
-        :param filepath: str, the path to the input JSON file.
+        :param file_path: str, the path to the input JSON file.
 
         :raises FileNotFoundError: If the file does not exist.
         """
 
         self.clear()
 
-        if not FileSystem.is_file(filepath):
-            raise FileNotFoundError(f"File '{filepath}' not found.")
+        if not FileSystem.is_file(file_path):
+            raise FileNotFoundError(f"File '{file_path}' not found.")
 
-        with open(filepath, 'r', encoding='utf-8') as file_handle:
+        with open(file_path, 'r', encoding='utf-8') as file_handle:
             self._registry = json.load(file_handle)

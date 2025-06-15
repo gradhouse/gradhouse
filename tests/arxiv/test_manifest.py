@@ -424,8 +424,8 @@ def test_import_arxiv_xml_valid(valid_xml_file):
         'manifest_timestamp_iso': '2025-04-07T08:58:03+00:00'
     }
     assert len(manifest._manifest['contents']) == 2
-    assert manifest._manifest['contents']['src/arXiv_src_0001_001.tar']['filename'] == 'src/arXiv_src_0001_001.tar'
-    assert manifest._manifest['contents']['src/arXiv_src_0002_001.tar']['filename'] == 'src/arXiv_src_0002_001.tar'
+    assert manifest._manifest['contents']['arXiv_src_0001_001.tar']['filename'] == 'src/arXiv_src_0001_001.tar'
+    assert manifest._manifest['contents']['arXiv_src_0002_001.tar']['filename'] == 'src/arXiv_src_0002_001.tar'
 
 def test_import_arxiv_xml_file_not_found():
     """
@@ -884,7 +884,7 @@ def test_import_arxiv_xml_duplicate_filename_raises_keyerror(patch_manifest_depe
     This hits the branch where duplicate filenames are detected.
     """
     manifest = Manifest()
-    with pytest.raises(KeyError, match="Bulk archive filenames not unique"):
+    with pytest.raises(KeyError, match="Bulk archive base filenames not unique"):
         manifest.import_arxiv_xml("dummy_path.xml")
 
 def test_list_keys():

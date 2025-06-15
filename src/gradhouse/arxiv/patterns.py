@@ -219,6 +219,7 @@ class Patterns:
     def check_bulk_archive(file_path: str) -> list[str]:
         """
         Validate an arXiv bulk archive file and return a list of error messages describing any issues found.
+        This method does not check against the manifest.
 
         This method performs a series of checks to ensure the file is a valid arXiv bulk archive:
           1. Checks that the filename matches the expected arXiv bulk archive naming pattern.

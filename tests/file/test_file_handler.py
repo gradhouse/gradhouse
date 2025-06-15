@@ -1,3 +1,9 @@
+# File: test_file_handler.py
+# Description: Unit tests for the FileHandler class.
+#
+# Copyright (c) 2025 Jason Stuber
+# Licensed under the MIT License. See the LICENSE file for more details.
+
 import pytest
 from gradhouse.file.file_handler import FileHandler
 from gradhouse.file.file_type import FileType

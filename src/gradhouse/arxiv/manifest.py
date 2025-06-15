@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from zoneinfo import ZoneInfo
 
+from gradhouse.file.file_name import FileName
 from gradhouse.file.file_system import FileSystem
 from gradhouse.services.time_service import TimeService
 from gradhouse.file.handler.xml_handler import XmlHandler
@@ -86,7 +87,7 @@ class Manifest:
     def list_keys(self) -> set[str]:
         """
         Return a list of all keys in the manifest.
-        The manifest uses the bulk archive filenames as keys.
+        The manifest uses the bulk archive base filenames as keys.
 
         :return: set[str], set of keys in the manifest.
         """
@@ -215,7 +216,7 @@ class Manifest:
         :raises FileNotFoundError: If the file is not found.
         :raises TypeError: If the file is not in XML format.
         :raises ValueError: If entries are missing in arXiv XML file
-        :raises KeyError: If the bulk archive filenames are not unique and cannot be used as keys.
+        :raises KeyError: If the bulk archive base filenames are not unique and cannot be used as keys.
         """
 
         self.clear()
@@ -237,10 +238,11 @@ class Manifest:
         for file_entry in xml_dict['arXivSRC']['file']:
             entry = Manifest._process_file_entry(file_entry)
             filename = entry['filename']
-            if filename not in self._manifest['contents']:
-                self._manifest['contents'][filename] = entry
+            base_filename = FileName.get_file_basename(filename)
+            if base_filename not in self._manifest['contents']:
+                self._manifest['contents'][base_filename] = entry
             else:
-                raise KeyError('Bulk archive filenames not unique and cannot be used for keys')
+                raise KeyError('Bulk archive base filenames not unique and cannot be used for keys')
 
     @staticmethod
     def _process_file_entry(file_entry: dict) -> dict:
