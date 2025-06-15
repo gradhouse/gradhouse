@@ -12,7 +12,7 @@ def test_enum_members_exist():
     Test that the SubmissionType members are present
     """
     assert hasattr(SubmissionType, 'SUBMISSION_TYPE_UNKNOWN')
-
+    assert hasattr(SubmissionType, 'SUBMISSION_TYPE_PDF')
     assert hasattr(SubmissionType, 'SUBMISSION_TYPE_POSTSCRIPT')
     assert hasattr(SubmissionType, 'SUBMISSION_TYPE_TEX')
 
@@ -21,7 +21,7 @@ def test_enum_values():
     Test that the SubmissionType enum values match expected values
     """
     assert SubmissionType.SUBMISSION_TYPE_UNKNOWN.value == 'UNKNOWN'
-
+    assert SubmissionType.SUBMISSION_TYPE_PDF.value == 'PDF'
     assert SubmissionType.SUBMISSION_TYPE_POSTSCRIPT.value == 'POSTSCRIPT'
     assert SubmissionType.SUBMISSION_TYPE_TEX.value == 'TEX'
 
@@ -32,8 +32,9 @@ def test_enum_no_extra_members():
 
     expected_members = {
         'SUBMISSION_TYPE_UNKNOWN',
-         'SUBMISSION_TYPE_POSTSCRIPT',
-         'SUBMISSION_TYPE_TEX'}
+        'SUBMISSION_TYPE_PDF',
+        'SUBMISSION_TYPE_POSTSCRIPT',
+        'SUBMISSION_TYPE_TEX'}
 
     actual_members = set(SubmissionType.__members__.keys())
     assert actual_members == expected_members, f"Unexpected members found: {actual_members - expected_members}"
