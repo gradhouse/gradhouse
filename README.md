@@ -1,16 +1,16 @@
-## Hi there 👋
+# gradhouse
 
-<!--
-**gradhouse/gradhouse** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+---
 
-Here are some ideas to get you started:
+## Projects
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+- **[arxiv-bucket](https://github.com/gradhouse/arxiv-bucket)**  
+  Tool for downloading, extracting, and processing arXiv bulk data from AWS S3 with validation and metadata management.
+
+---
+
+## Contact
+
+- GitHub: [@gradhouse](https://github.com/gradhouse)
+
+---
